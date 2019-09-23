@@ -37,7 +37,7 @@ export default {
     },
     login () {
       console.log(this.inputName + this.inputPasswd)
-      // this.$router.push('/index')
+      this.$router.push('/index')
     },
     forgetPasswd () {
       console.log('forget passwd')
@@ -55,7 +55,7 @@ export default {
   }
   .container {
     width: 100%;
-    height: 700px;
+    height: 100%;
     float: left;
     position: relative;
   }
