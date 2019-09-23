@@ -1,10 +1,10 @@
 <template>
-  <div></div>
+  <div>设备调节</div>
 </template>
 
 <script>
 export default {
-  name: 'homepage2'
+  name: 'homepage3'
 }
 </script>
 

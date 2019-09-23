@@ -1,10 +1,10 @@
 <template>
-  <div></div>
+  <div>历史数据</div>
 </template>
 
 <script>
 export default {
-  name: 'homepage4'
+  name: 'homepage2'
 }
 </script>
 

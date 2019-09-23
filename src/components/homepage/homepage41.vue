@@ -1,11 +1,10 @@
 <template>
-  <div>
-  </div>
+  <div>训练模型</div>
 </template>
 
 <script>
 export default {
-  name: 'homepage1'
+  name: 'homepage5'
 }
 </script>
 

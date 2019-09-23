@@ -1,10 +1,10 @@
 <template>
-  <div></div>
+  <div>阈值设置</div>
 </template>
 
 <script>
 export default {
-  name: 'homepage3'
+  name: 'homepage4'
 }
 </script>
 

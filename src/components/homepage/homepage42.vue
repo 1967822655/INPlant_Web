@@ -1,10 +1,10 @@
 <template>
-  <div></div>
+  <div>模型预测</div>
 </template>
 
 <script>
 export default {
-  name: 'homepage5'
+  name: 'homepage6'
 }
 </script>
 
