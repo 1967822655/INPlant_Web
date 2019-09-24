@@ -3,7 +3,8 @@
   margin: 0px;
 }
 .el-header, .el-footer {
-  background-color: #B3C0D1;
+  /*background-color: #B3C0D1;*/
+  background-color: white;
   color: #333;
   /*text-align: center;*/
   height: 100%;
@@ -11,7 +12,8 @@
 }
 
 .el-aside {
-  background-color: #D3DCE6;
+  /*background-color: #D3DCE6;*/
+  background-color: white;
   color: #333;
   /*text-align: center;*/
   height: 100%;
@@ -19,7 +21,9 @@
 }
 
 .el-main {
-  background-color: #E9EEF3;
+  /*background-color: #E9EEF3;*/
+  display: flex;
+  background-color: white;
   color: #333;
   /*text-align: center;*/
   /*line-height: 160px;*/

@@ -3,10 +3,10 @@
       <div class="login-picture">
         <div class="login-form">
           <p class="title">用户登录</p>
-          <p class="login-item error">{{inputError}}</p>
-          <el-input class="login-item" v-model="inputName" placeholder="请输入用户账号" clearable prefix-icon="el-icon-user" @change="check"></el-input>
-          <el-input class="login-item" v-model="inputPasswd" placeholder="请输入密码" prefix-icon="el-icon-key" show-password @change="check" @keyup.enter="login"></el-input>
-          <el-button class="login-item" type="primary" :disabled="isLogin" @click="login">登录</el-button>
+          <span class="login-item error">{{inputError}}</span>
+          <el-input class="login-item" v-model="inputName" placeholder="请输入用户账号" clearable prefix-icon="el-icon-user"></el-input>
+          <el-input class="login-item" v-model="inputPasswd" placeholder="请输入密码" prefix-icon="el-icon-key" show-password @keyup.enter="login"></el-input>
+          <el-button class="login-item" type="primary" @click="login">登录</el-button>
           <el-link class="login-item" type="primary" :underline="false">忘记密码?</el-link>
         </div>
       </div>
@@ -18,7 +18,6 @@ export default {
   name: 'login',
   data () {
     return {
-      isLogin: true,
       inputError: '',
       inputName: '',
       inputPasswd: ''
@@ -27,17 +26,15 @@ export default {
   mounted () {
   },
   methods: {
-    check () {
-      console.log(this.inputName + this.inputPasswd)
-      if (this.inputName === '' || this.inputPasswd === '') {
-        this.isLogin = true
-      } else {
-        this.isLogin = false
-      }
-    },
     login () {
       console.log(this.inputName + this.inputPasswd)
-      this.$router.push('/index')
+      if (this.inputName === '' || this.inputPasswd === '') {
+        this.inputError = '输入不正确'
+      } else {
+        /* websocket 请求数据，密码是否正确
+        * */
+        this.$router.push('/index')
+      }
     },
     forgetPasswd () {
       console.log('forget passwd')
@@ -47,12 +44,6 @@ export default {
 </script>
 
 <style scoped>
-  body {
-    margin: 0;
-    padding: 0;
-    height:100%;
-    width:100%;
-  }
   .container {
     width: 100%;
     height: 100%;
@@ -69,21 +60,22 @@ export default {
   }
   .container .login-form {
     width: 25%;
-    height: 45%;
+    /*height: 45%;*/
     position: absolute;
     top: 25%;
     left: 55%;
-    overflow: hidden;
+    overflow: auto;
     background:white;
     border-radius: 10px;
     box-shadow: 2px 5px 5px #888888;
+    padding: 20px 0px;
   }
   .container .login-form  .title{
     text-align: center;
     font-size: 20px;
     letter-spacing: 0.2em;
-    margin-top: 25px;
-    margin-bottom: 35px;
+    margin-top: 5px;
+    margin-bottom: 25px;
   }
   .container .login-form .login-item{
     width: 90%;
