@@ -6,6 +6,7 @@
     <el-divider></el-divider>
     <div class="thresholdSetting-content">
       <el-table
+        v-loading="loadingTableData"
         :data="thresholdTableData">
         <el-table-column
           prop="valueName"
@@ -31,7 +32,7 @@
           label="操作"
           align="center">
           <template slot-scope="scope">
-            <el-button @click="edit (scope.row)" type="text" size="small">修改</el-button>
+            <el-button @click="edit (scope.$index, scope.row)" type="primary" icon="el-icon-edit" size="small">修改</el-button>
           </template>
         </el-table-column>
       </el-table>
@@ -44,8 +45,10 @@
         </el-form-item>
         <el-form-item label="单位" :label-width="formLabelWidth">
           <el-input v-model="dialogForm.unitName" disabled></el-input>
+<!--          <label >{{dialogForm.unitName}}</label>-->
         </el-form-item>
         <el-form-item label="阈值上限" :label-width="formLabelWidth">
+<!--          或者用滑块slide-->
           <el-input-number v-model="dialogForm.thresholdMax" :precision="2" :step="0.1"
                            :max="dialogForm.max" :min="dialogForm.min"></el-input-number>
         </el-form-item>
@@ -57,7 +60,7 @@
       </el-form>
       <div slot="footer" class="dialog-footer">
         <el-button @click="dialogFormVisible = false">取 消</el-button>
-        <el-button type="primary" @click="update ">确 定</el-button>
+        <el-button type="primary" @click="update " :loading="isUpLoading">{{isUpLoading ?  '更新中' : '确 定'}}</el-button>
       </div>
     </el-dialog>
   </div>
@@ -67,11 +70,12 @@
 export default {
   name: 'homepage4',
   methods: {
-    edit (row) {
+    edit (index, row) {
       this.dialogForm.valueName = row.valueName
       this.dialogForm.unitName = row.unitName
       this.dialogForm.min = row.min
       this.dialogForm.max = row.max
+      this.dialogForm.index = index
       console.log(row.thresholdMin === '-')
       console.log(row.thresholdMax === '-')
       if (row.thresholdMin === '-') {
@@ -88,12 +92,7 @@ export default {
       this.dialogFormVisible = true
     },
     update () {
-      var i = 0
-      for (; i < this.thresholdTableData.length; i++) {
-        if (this.thresholdTableData[i].valueName === this.dialogForm.valueName) {
-          break
-        }
-      }
+      var i = this.dialogForm.index
       if (this.dialogForm.thresholdMin) {
         this.thresholdTableData[i].thresholdMin = this.dialogForm.thresholdMin
       } else {
@@ -104,12 +103,22 @@ export default {
       } else {
         this.thresholdTableData[i].thresholdMax = '-'
       }
-      this.dialogFormVisible = false
+      this.isUpLoading = true
+      setTimeout(() => {
+        this.isUpLoading = false
+        this.dialogFormVisible = false
+      }, 2000)
     }
   },
-
+  created () {
+    console.log('加载数据到thresholdTableData中')
+    setTimeout(() => {
+      this.loadingTableData = false
+    }, 1000)
+  },
   data () {
     return {
+      loadingTableData: true,
       thresholdTableData: [{
         valueName: '温度',
         thresholdMin: '1',
@@ -121,7 +130,7 @@ export default {
         valueName: '湿度',
         thresholdMin: '3',
         thresholdMax: '-',
-        unitName: '%rh',
+        unitName: '%',
         max: 9,
         min: 1
       }, {
@@ -129,6 +138,13 @@ export default {
         thresholdMin: '-',
         thresholdMax: '4',
         unitName: 'ppm',
+        max: 5,
+        min: 1
+      }, {
+        valueName: '光照',
+        thresholdMin: '-',
+        thresholdMax: '4',
+        unitName: 'lux',
         max: 5,
         min: 1
       }, {
@@ -142,7 +158,7 @@ export default {
         valueName: '营养液浓度',
         thresholdMin: '6',
         thresholdMax: '7',
-        unitName: 'mg/L',
+        unitName: 'us/cm',
         max: 10,
         min: 1
       }],
@@ -153,10 +169,12 @@ export default {
         thresholdMax: '',
         unitName: '',
         max: 2,
-        min: 1
+        min: 1,
+        index: -1
       },
       formLabelWidth: '100px',
-      thresholdInputError: ''
+      thresholdInputError: '',
+      isUpLoading: false
     }
   }
 }
@@ -177,6 +195,13 @@ export default {
   }
   .thresholdSetting-content > el-table > el-table-column {
     width: 20%;
+  }
+  el-dialog el-input {
+    color: black;
+    -webkit-text-fill-color: #7d7e80;
+    -webkit-opacity: 1;
+    opacity: 1;  //默认的不透明级别为0.3
+    background-color: #fff;
   }
   .thresholdSetting-error {
     color: red;
