@@ -1,12 +1,14 @@
 <template>
     <div class="container">
       <div class="login-picture">
+        <a href="https://free.modao.cc/app/3rkxnjr01k3k0q3oce5po8q31wvpda#screen=sk0q3ocs96afkwz6g" target="_blank">墨刀样式</a>
         <div class="login-form">
           <p class="title">用户登录</p>
-          <span class="login-item error">{{inputError}}</span>
-          <el-input class="login-item" v-model="inputName" placeholder="请输入用户账号" clearable prefix-icon="el-icon-user"></el-input>
-          <el-input class="login-item" v-model="inputPasswd" placeholder="请输入密码" prefix-icon="el-icon-key" show-password @keyup.enter="login"></el-input>
+          <p class="login-item error">{{inputError}}</p>
+          <el-input class="login-item" v-model="inputName" placeholder="请输入用户账号" clearable prefix-icon="el-icon-user" @change="check"></el-input>
+          <el-input class="login-item" v-model="inputPasswd" placeholder="请输入密码" prefix-icon="el-icon-key" show-password @change="check" @keyup.enter="login"></el-input>
           <el-button class="login-item" type="primary" @click="login">登录</el-button>
+<!--          <el-button class="login-item" type="primary" :disabled="isLogin" @click="login">登录</el-button>-->
           <el-link class="login-item" type="primary" :underline="false">忘记密码?</el-link>
         </div>
       </div>
@@ -18,6 +20,7 @@ export default {
   name: 'login',
   data () {
     return {
+      isLogin: true,
       inputError: '',
       inputName: '',
       inputPasswd: ''
@@ -26,15 +29,17 @@ export default {
   mounted () {
   },
   methods: {
-    login () {
+    check () {
       console.log(this.inputName + this.inputPasswd)
       if (this.inputName === '' || this.inputPasswd === '') {
-        this.inputError = '输入不正确'
+        this.isLogin = true
       } else {
-        /* websocket 请求数据，密码是否正确
-        * */
-        this.$router.push('/index')
+        this.isLogin = false
       }
+    },
+    login () {
+      console.log(this.inputName + this.inputPasswd)
+      this.$router.push('/index')
     },
     forgetPasswd () {
       console.log('forget passwd')
@@ -60,22 +65,21 @@ export default {
   }
   .container .login-form {
     width: 25%;
-    /*height: 45%;*/
+    height: 45%;
     position: absolute;
     top: 25%;
     left: 55%;
-    overflow: auto;
+    overflow: hidden;
     background:white;
     border-radius: 10px;
     box-shadow: 2px 5px 5px #888888;
-    padding: 20px 0px;
   }
   .container .login-form  .title{
     text-align: center;
     font-size: 20px;
     letter-spacing: 0.2em;
-    margin-top: 5px;
-    margin-bottom: 25px;
+    margin-top: 25px;
+    margin-bottom: 35px;
   }
   .container .login-form .login-item{
     width: 90%;
