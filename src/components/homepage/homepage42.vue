@@ -47,7 +47,7 @@
 
 <script>
 export default {
-  name: 'homepage6',
+  name: 'homepage42',
   methods: {
     modelHandle (index) {
       console.log('添加模型')

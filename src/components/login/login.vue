@@ -2,6 +2,7 @@
     <div class="container">
       <div class="login-picture">
         <a href="https://free.modao.cc/app/3rkxnjr01k3k0q3oce5po8q31wvpda#screen=sk0q3ocs96afkwz6g" target="_blank">墨刀样式</a>
+        <a href="https://docs.qq.com/sheet/DVWFNV0ZESllORG1j?tab=BB08J2&c=A1A0A0" target="_blank">接口文档</a>
         <div class="login-form">
           <p class="title">用户登录</p>
           <p class="login-item error">{{inputError}}</p>

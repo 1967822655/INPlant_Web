@@ -5,6 +5,8 @@ import login from '@/components/login/login'
 import index from '@/components/homepage/index'
 import homepage from '@/components/homepage/homepage'
 
+window.echarts = require('echarts')
+
 Vue.use(Router)
 
 export default new Router({

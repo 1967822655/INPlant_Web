@@ -68,7 +68,7 @@
 
 <script>
 export default {
-  name: 'homepage4',
+  name: 'homepage3',
   methods: {
     edit (index, row) {
       this.dialogForm.valueName = row.valueName

@@ -4,7 +4,7 @@
 
 <script>
 export default {
-  name: 'homepage3'
+  name: 'homepage2'
 }
 </script>
 

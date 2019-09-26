@@ -52,7 +52,7 @@
 
 <script>
 export default {
-  name: 'homepage5',
+  name: 'homepage41',
   methods: {
     handleDelete (index, row) {
       console.log(index)

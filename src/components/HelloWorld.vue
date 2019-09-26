@@ -1,117 +1,3 @@
-<!--<template>-->
-<!--  <div class="hello">-->
-<!--    <h1>{{ msg }}</h1>-->
-<!--    <el-button type="primary">success</el-button>-->
-<!--    <h2>Essential Links</h2>-->
-<!--    <ul>-->
-<!--      <li>-->
-<!--        <a-->
-<!--          href="https://vuejs.org"-->
-<!--          target="_blank"-->
-<!--        >-->
-<!--          Core Docs-->
-<!--        </a>-->
-<!--      </li>-->
-<!--      <li>-->
-<!--        <a-->
-<!--          href="https://forum.vuejs.org"-->
-<!--          target="_blank"-->
-<!--        >-->
-<!--          Forum-->
-<!--        </a>-->
-<!--      </li>-->
-<!--      <li>-->
-<!--        <a-->
-<!--          href="https://chat.vuejs.org"-->
-<!--          target="_blank"-->
-<!--        >-->
-<!--          Community Chat-->
-<!--        </a>-->
-<!--      </li>-->
-<!--      <li>-->
-<!--        <a-->
-<!--          href="https://twitter.com/vuejs"-->
-<!--          target="_blank"-->
-<!--        >-->
-<!--          Twitter-->
-<!--        </a>-->
-<!--      </li>-->
-<!--      <br>-->
-<!--      <li>-->
-<!--        <a-->
-<!--          href="http://vuejs-templates.github.io/webpack/"-->
-<!--          target="_blank"-->
-<!--        >-->
-<!--          Docs for This Template-->
-<!--        </a>-->
-<!--      </li>-->
-<!--    </ul>-->
-<!--    <h2>Ecosystem</h2>-->
-<!--    <ul>-->
-<!--      <li>-->
-<!--        <a-->
-<!--          href="http://router.vuejs.org/"-->
-<!--          target="_blank"-->
-<!--        >-->
-<!--          vue-router-->
-<!--        </a>-->
-<!--      </li>-->
-<!--      <li>-->
-<!--        <a-->
-<!--          href="http://vuex.vuejs.org/"-->
-<!--          target="_blank"-->
-<!--        >-->
-<!--          vuex-->
-<!--        </a>-->
-<!--      </li>-->
-<!--      <li>-->
-<!--        <a-->
-<!--          href="http://vue-loader.vuejs.org/"-->
-<!--          target="_blank"-->
-<!--        >-->
-<!--          vue-loader-->
-<!--        </a>-->
-<!--      </li>-->
-<!--      <li>-->
-<!--        <a-->
-<!--          href="https://github.com/vuejs/awesome-vue"-->
-<!--          target="_blank"-->
-<!--        >-->
-<!--          awesome-vue-->
-<!--        </a>-->
-<!--      </li>-->
-<!--    </ul>-->
-<!--  </div>-->
-<!--</template>-->
-
-<!--<script>-->
-<!--export default {-->
-<!--  name: 'HelloWorld',-->
-<!--  data () {-->
-<!--    return {-->
-<!--      msg: 'Welcome to Your Vue.js App'-->
-<!--    }-->
-<!--  }-->
-<!--}-->
-<!--</script>-->
-
-<!--&lt;!&ndash; Add "scoped" attribute to limit CSS to this component only &ndash;&gt;-->
-<!--<style scoped>-->
-<!--h1, h2 {-->
-<!--  font-weight: normal;-->
-<!--}-->
-<!--ul {-->
-<!--  list-style-type: none;-->
-<!--  padding: 0;-->
-<!--}-->
-<!--li {-->
-<!--  display: inline-block;-->
-<!--  margin: 0 10px;-->
-<!--}-->
-<!--a {-->
-<!--  color: #42b983;-->
-<!--}-->
-<!--</style>-->
 <template>
   <div class="div_main">
     <div class="classify">
@@ -132,7 +18,7 @@
 
     <div class="courseList">
       <table>
-        <tr v-for="(course) in courses" :key="course">
+        <div v-for="course in courses" :key="course.info">
           <a href="#" id="a">
             <!--<div @mouseover="onMouseOver(index)" @mouseleave="onMouseOut(index)">-->
             <div style="height: 300px;width: 200px;background-color: blue;position: relative">
@@ -147,7 +33,7 @@
               </div>
             </div>
           </a>
-        </tr>
+        </div>
       </table>
     </div>
 
@@ -164,11 +50,11 @@ export default {
   name: 'HelloWorld',
   data () {
     return {
-      course: '',
+      course: 1,
       courses: [
-        {img: '', info: '简介1', content: '要在实验楼愉快地学习，先要熟练地使用 Linux，本实验中通过在线动手实验的方式学习 Linux 常用命令，用户与权限管理，目录结构与文件操作，环境变量，计划任务，管道与数据流重定向等基本知识点。\n'},
-        {img: '', info: '简介2', content: '要在实验楼愉快地学习，先要熟练地使用 Linux，本实验中通过在线动手实验的方式学习 Linux 常用命令，用户与权限管理，目录结构与文件操作，环境变量，计划任务，管道与数据流重定向等基本知识点。\n'},
-        {img: '', info: '简介3', content: '要在实验楼愉快地学习，先要熟练地使用 Linux，本实验中通过在线动手实验的方式学习 Linux 常用命令，用户与权限管理，目录结构与文件操作，环境变量，计划任务，管道与数据流重定向等基本知识点。\n'}
+        {img: '', info: '简介1', content: '1要在实验楼愉快地学习，先要熟练地使用 Linux，本实验中通过在线动手实验的方式学习 Linux 常用命令，用户与权限管理，目录结构与文件操作，环境变量，计划任务，管道与数据流重定向等基本知识点。\n'},
+        {img: '', info: '简介2', content: '2要在实验楼愉快地学习，先要熟练地使用 Linux，本实验中通过在线动手实验的方式学习 Linux 常用命令，用户与权限管理，目录结构与文件操作，环境变量，计划任务，管道与数据流重定向等基本知识点。\n'},
+        {img: '', info: '简介3', content: '3要在实验楼愉快地学习，先要熟练地使用 Linux，本实验中通过在线动手实验的方式学习 Linux 常用命令，用户与权限管理，目录结构与文件操作，环境变量，计划任务，管道与数据流重定向等基本知识点。\n'}
       ],
       tags: [
         {content: '全部'},
