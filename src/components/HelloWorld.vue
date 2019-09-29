@@ -1,127 +1,107 @@
 <template>
-  <div class="div_main">
-    <div class="classify">
-      <span>方向:</span>
-<!--      <RadioGroup type="button">-->
-<!--        <Radio label="全部"></Radio>-->
-<!--        <Radio label="后端开发"></Radio>-->
-<!--        <Radio label="Linux运维"></Radio>-->
-<!--        <Radio label="云计算大数据"></Radio>-->
-<!--      </RadioGroup>-->
-      <br>
-      <br>
-      <span>标签:</span>
-<!--      <RadioGroup type="button" size="small" >-->
-<!--        <Radio v-for="(tag, index0) in tags" :key="index0" :label="tag.content"></Radio>-->
-<!--      </RadioGroup>-->
-    </div>
-
-    <div class="courseList">
-      <table>
-        <div v-for="course in courses" :key="course.info">
-          <a href="#" id="a">
-            <!--<div @mouseover="onMouseOver(index)" @mouseleave="onMouseOut(index)">-->
-            <div style="height: 300px;width: 200px;background-color: blue;position: relative">
-              <div>
-                <img src="../assets/logo.png">
-              </div>
-              <div class="demo" >
-                {{course.info}}
-                <div>
-                  <span>{{course.content}}</span>
-                </div>
-              </div>
-            </div>
-          </a>
-        </div>
-      </table>
-    </div>
-
-    <div class="page">
-<!--      <Page :total="1000" prev-text="上一页" next-text="下一页" />-->
-      <!--on-change 页码改变的回调，返回改变后的页码 页码-->
-      <!--on-page-size-change 切换每页条数时的回调，返回切换后的每页条数 page-size-->
-    </div>
+  <div>
+    <p>{{msg}}</p>
   </div>
 </template>
-
 <script>
 export default {
-  name: 'HelloWorld',
   data () {
     return {
-      course: 1,
-      courses: [
-        {img: '', info: '简介1', content: '1要在实验楼愉快地学习，先要熟练地使用 Linux，本实验中通过在线动手实验的方式学习 Linux 常用命令，用户与权限管理，目录结构与文件操作，环境变量，计划任务，管道与数据流重定向等基本知识点。\n'},
-        {img: '', info: '简介2', content: '2要在实验楼愉快地学习，先要熟练地使用 Linux，本实验中通过在线动手实验的方式学习 Linux 常用命令，用户与权限管理，目录结构与文件操作，环境变量，计划任务，管道与数据流重定向等基本知识点。\n'},
-        {img: '', info: '简介3', content: '3要在实验楼愉快地学习，先要熟练地使用 Linux，本实验中通过在线动手实验的方式学习 Linux 常用命令，用户与权限管理，目录结构与文件操作，环境变量，计划任务，管道与数据流重定向等基本知识点。\n'}
-      ],
-      tags: [
-        {content: '全部'},
-        {content: 'Python'},
-        {content: 'Java'},
-        {content: 'C'}
-      ],
-      seen: false
+      reconnectTimeout: 2000,
+      mqtt: {},
+      msg: '',
+      host: '',
+      port: '',
+      addtopic: '',
+      useTLS: false,
+      username: '',
+      password: '',
+      cleansession: false
     }
   },
-
+  mounted () {
+    this.MQTTconnect()
+  },
   methods: {
-    // onMouseOver (i) {
-    //   console.log(i)
-    //   this.seen = true
-    // },
-    // onMouseOut (i) {
-    //   this.seen = false
-    // }
+    addtopic (msg) {
+      this.msg = msg
+    },
+
+    // 实时通信
+    MQTTconnect () {
+      this.mqtt = new Paho.MQTT.Client( // 实例化一个对象
+        host,
+        port,
+        'client' + this.getuuid() // 防止多个浏览器打开，导致的问题，保证唯一性
+      )
+      var options = {
+        timeout: 10,
+        useSSL: useTLS,
+        cleanSession: cleansession,
+        // 如果为false(flag=0)，Client断开连接后，Server应该保存Client的订阅信息。如果为true(flag=1)，表示Server应该立刻丢弃任何会话状态信息。
+        onSuccess: this.onConnect,
+        onFailure: function (message) {
+          // 连接失败定时重连
+          setTimeout(this.MQTTconnect, this.reconnectTimeout)
+        }
+      }
+      this.mqtt.onConnectionLost = this.onConnectionLost
+      this.mqtt.onMessageArrived = this.onMessageArrived
+      // 用户名和密码的验证，我这里都为空；不加验证
+      if (username != null) {
+        options.userName = username
+        options.password = password
+      }
+      this.mqtt.connect(options)
+    },
+    // uuid随机生成
+    getuuid () {
+      var uid = []
+      var hexDigits = '0123456789abcdefghijklmnopqrst'
+      for (var i = 0; i < 32; i++) {
+        uid[i] = hexDigits.substr(Math.floor(Math.random() * 0x10), 1)
+      }
+      uid[6] = '4'
+      uid[15] = hexDigits.substr((uid[15] & 0x3) | 0x8, 1)
+      var uuid = uid.join('')
+      return uuid
+    },
+    // 连接
+    onConnect () {
+      // 连接成功，订阅主题
+      this.mqtt.subscribe(addtopic, {
+        qos: 2
+        // QoS0，最多一次送达。也就是发出去就fire掉，没有后面的事情了。
+        // QoS1，至少一次送达。发出去之后必须等待ack，没有ack，就要找时机重发
+        // QoS2，准确一次送达。消息id将拥有一个简单的生命周期。
+      })
+
+      // 发布一个消息，再连接成功后，发送一个响应，确保连接没有问题；
+      this.mqtt.send('login', '{"command":"login","clientId":"' + this.mqtt.clientId + '"}', 0)
+    },
+    // 连接丢失
+    onConnectionLost (response) {
+      // console.log("异常掉线，掉线信息为:" + response.errorMessage);
+    },
+
+    // 接收到消息，处理
+    onMessageArrived (message) {
+      var topics = message.destinationName
+      var msg = $.parseJSON(message.payloadString)
+      // 判断主题，调用方法，这里可以订阅多个主题，在此处判断，接受不同的主题，调用不同的方法！
+      if (topics == 'add') {
+        // 添加
+        this.addtopic(msg)
+      } else {
+
+      }
+    }
   }
 }
 </script>
-
 <style>
-  #div_main{
-    text-align: center;
-  }
-  .classify{
-    /*position: absolute;*/
-    /*top: 150px;*/
-    /*left: 400px;*/
-    /*float: left;*/
-    margin: 0px auto;
-  }
-  .classify *{
-    left: 0;
-  }
-  .courseList{
-    /*position: absolute;*/
-    top: 300px;
-    left: 500px;
-    float: left;
-  }
-  /*.demo{*/
-  /*position: absolute;*/
-  /*width: 200px;*/
-  /*height: 20px;*/
-  /*bottom: 420px;*/
-  /*background: white;*/
-  /*}*/
-  .demo{
-    position: absolute;
-    /*margin-top: 100px;*/
-    /*margin-left: 50px;*/
-    width: 200px;
-    height: 100px;
-    bottom: 0px;
-    background: black;
-    -webkit-transition: height 2s;
-    transition: height 2s;
-  }
-  #a:hover .demo{
-    height: 200px;
-  }
-  .page{
-    position: absolute;
-    bottom: 30px;
-    left: 40%;
+  .apps {
+    width: 100%;
+    overflow: hidden;
   }
 </style>

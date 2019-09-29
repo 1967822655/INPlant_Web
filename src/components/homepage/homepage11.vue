@@ -1,6 +1,9 @@
 <template>
   <div style="width: 100%">
     <div>实时数据</div>
+    <div style="height: 300px;width: 100%;background-color: white">
+
+    </div>
     <div id="realTimeTable" style="height: 600px; width: 100%"></div>
   </div>
 </template>
@@ -11,7 +14,7 @@ export default {
   name: 'homepage11',
   data () {
     return {
-      date: [1, 2, 3, 4, 5, 6, 7],
+      time: [1, 2, 3, 4, 5, 6, 7],
       temperature: [120, 132, 101, 134, 90, 230, 210],
       humidity: [320, 332, 301, 334, 390, 330, 320],
       CO2concentration: [220, 182, 191, 234, 290, 330, 310],
@@ -25,7 +28,7 @@ export default {
     this.realTimeEcharts()
     var _this = this
     this.test = setInterval(function () {
-      _this.date.push(_this.date[_this.date.length - 1] + 1)
+      _this.time.push(_this.time[_this.time.length - 1] + 1)
       _this.temperature.push(_this.temperature[_this.temperature.length - 1] + 1)
       _this.humidity.push(_this.humidity[_this.humidity.length - 1] + 1)
       _this.CO2concentration.push(_this.CO2concentration[_this.CO2concentration.length - 1] + 1)
@@ -33,7 +36,7 @@ export default {
       _this.ph.push(_this.ph[_this.ph.length - 1] + 1)
       _this.nutrientConcentration.push(_this.nutrientConcentration[_this.nutrientConcentration.length - 1] + 1)
       _this.realTimeEcharts()
-    }, 1000)
+    }, 2000)
   },
   destroyed: function () {
     clearInterval(this.test)// 离开改层时执行
@@ -66,7 +69,7 @@ export default {
         xAxis: {
           type: 'category',
           boundaryGap: false,
-          data: this.date
+          data: this.time
         },
         yAxis: {
           type: 'value'
