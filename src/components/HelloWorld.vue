@@ -24,14 +24,15 @@ export default {
   },
   methods: {
     connectToMqtt () {
+      console.log(this.url)
+      console.log(this.userInfo)
       const client = mqtt.connect(this.url, this.userInfo)
       this.mqttClient = client
-      client.on('connect', function () {
+      client.on('connect', () => {
         console.log('connected...')
         console.log('成功连接服务器')
-        // console.log(client)
-        // 订阅一个主题 (topic 会报错)
-        client.subscribe('6af6188e14aa', (error) => {
+        // 订阅一个主题
+        client.subscribe(this.topic, (error) => {
           if (!error) {
             console.log('订阅成功')
           }
