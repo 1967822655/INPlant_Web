@@ -31,8 +31,8 @@
                 <i class="el-icon-location"></i>
                 <span>数据显示</span>
               </template>
-              <el-menu-item index="1-1" @click="handleSelect">实时数据</el-menu-item>
-              <el-menu-item index="1-2" @click="handleSelect">历史数据</el-menu-item>
+              <el-menu-item index="1-1" @click="handleSelect">历史数据</el-menu-item>
+              <el-menu-item index="1-2" @click="handleSelect">实时数据</el-menu-item>
             </el-submenu>
             <el-menu-item index="2" @click="handleSelect">
               <i class="el-icon-menu"></i>

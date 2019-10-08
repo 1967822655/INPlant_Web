@@ -46,7 +46,7 @@
           </div>
           <el-input class="login-item" v-model="findPassword" placeholder="请输入修改密码" prefix-icon="el-icon-key" show-password @keyup.enter="login"></el-input>
           <el-input class="login-item" v-model="findAgain" placeholder="请确认密码" prefix-icon="el-icon-key" show-password @keyup.enter="login"></el-input>
-          <el-button class="login-item" type="primary" @click="find">注册账号</el-button>
+          <el-button class="login-item" type="primary" @click="find">修改密码</el-button>
           <div class="login-item" style="margin-left: 5%">
             <el-link class="right" type="primary" :underline="false" @click="chooseInterface(1)">返回登录</el-link>
           </div>
@@ -178,7 +178,7 @@ export default {
           // console.log(this.findEmail)
           let findCode = new FormData()
           findCode.append('username', this.findEmail)
-          this.axios.post(data.serverSrc + '/user/regsendpwdsendcode', findCode).then(body => {
+          this.axios.post(data.serverSrc + '/user/resetpwdsendcode', findCode).then(body => {
             // console.log(body)
             if (body.data === 'success') {
               this.$message.success('发送成功')
@@ -204,9 +204,9 @@ export default {
       } else {
         let findParam = new FormData()
         findParam.append('username', this.findEmail)
-        findParam.append('password', this.findPassword)
+        findParam.append('newpassword', this.findPassword)
         findParam.append('code', this.findCode)
-        this.axios.post(data.serverSrc + '/user/reg', findParam).then(body => {
+        this.axios.post(data.serverSrc + '/user/resetpwd', findParam).then(body => {
           console.log(body.data)
           if (body.data === 'success') {
             this.$message.success('修改成功')

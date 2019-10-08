@@ -1,85 +1,11 @@
 <template>
   <div style="width: 100%">
-    <div>历史数据</div>
-    <div id="historyTable" style="height: 600px; width: 100%"></div>
-    <el-table
-      :data="tableDataEnd"
-      stripe>
-      <el-table-column
-        prop="name"
-        label="时间"
-        min-width="100"
-        height="150">
-        <template slot-scope="scope">
-          <span size="small">{{scope.row.time}}</span>
-        </template>
-      </el-table-column>
-      <el-table-column
-        prop="name"
-        label="温度"
-        min-width="100"
-        height="150">
-        <template slot-scope="scope">
-          <span size="small">{{scope.row.temperature}}</span>
-        </template>
-      </el-table-column>
-      <el-table-column
-        prop="name"
-        label="湿度"
-        min-width="100"
-        height="150">
-        <template slot-scope="scope">
-          <span size="small">{{scope.row.humidity}}</span>
-        </template>
-      </el-table-column>
-      <el-table-column
-        prop="name"
-        label="CO2浓度"
-        min-width="100"
-        height="150">
-        <template slot-scope="scope">
-          <span size="small">{{scope.row.CO2concentration}}</span>
-        </template>
-      </el-table-column>
-      <el-table-column
-        prop="name"
-        label="光照"
-        min-width="100"
-        height="150">
-        <template slot-scope="scope">
-          <span size="small">{{scope.row.light}}</span>
-        </template>
-      </el-table-column>
-      <el-table-column
-        prop="name"
-        label="酸碱度"
-        min-width="100"
-        height="150">
-        <template slot-scope="scope">
-          <span size="small">{{scope.row.ph}}</span>
-        </template>
-      </el-table-column>
-      <el-table-column
-        prop="name"
-        label="营养液浓度"
-        min-width="100"
-        height="150">
-        <template slot-scope="scope">
-          <span size="small">{{scope.row.nutrientConcentration}}</span>
-        </template>
-      </el-table-column>
-    </el-table>
-    <div style="text-align: center; margin-top: 10px;">
-      <el-pagination
-        @size-change="handleSizeChange"
-        @current-change="handleCurrentChange"
-        :current-page="currentPage"
-        :page-sizes="[8, 12, 16, 20, 30]"
-        :page-size="pageSize"
-        layout="total, sizes, prev, pager, next, jumper"
-        :total="totalItems">
-      </el-pagination>
+    <div>实时数据</div>
+    <div style="height: 300px;width: 100%;background-color: white">
+
     </div>
+    <button @click="sendDevName()">XXXXXXXXXXXXXXxxx</button>
+    <div id="realTimeTable" style="height: 600px; width: 100%"></div>
   </div>
 </template>
 
@@ -96,32 +22,131 @@ export default {
       light: [150, 232, 201, 154, 190, 330, 410],
       ph: [820, 932, 901, 934, 1290, 1330, 1320],
       nutrientConcentration: [999, 1020, 528, 287, 398, 873, 256],
-      tableDataBegin: [],
-      tableDataName: '',
-      tableDataEnd: [],
-      currentPage: 1,
-      pageSize: 8,
-      totalItems: 8,
-      filterTableDataEnd: [],
-      flag: true
+      test: null
     }
   },
   mounted () {
-    this.historyEcharts()
-    var testData = {
-      time: [1, 2, 3, 4, 5, 6, 7],
-      temperature: [120, 132, 101, 134, 90, 230, 210],
-      humidity: [320, 332, 301, 334, 390, 330, 320],
-      CO2concentration: [220, 182, 191, 234, 290, 330, 310],
-      light: [150, 232, 201, 154, 190, 330, 410],
-      ph: [820, 932, 901, 934, 1290, 1330, 1320],
-      nutrientConcentration: [999, 1020, 528, 287, 398, 873, 256]
-    }
-    this.openData(testData)
+    this.realTimeEcharts()
+    var _this = this
+    this.test = setInterval(function () {
+      _this.time.push(_this.time[_this.time.length - 1] + 1)
+      _this.temperature.push(_this.temperature[_this.temperature.length - 1] + 1)
+      _this.humidity.push(_this.humidity[_this.humidity.length - 1] + 1)
+      _this.CO2concentration.push(_this.CO2concentration[_this.CO2concentration.length - 1] + 1)
+      _this.light.push(_this.light[_this.light.length - 1] + 1)
+      _this.ph.push(_this.ph[_this.ph.length - 1] + 1)
+      _this.nutrientConcentration.push(_this.nutrientConcentration[_this.nutrientConcentration.length - 1] + 1)
+      _this.realTimeEcharts()
+    }, 2000)
+    // websocket初始化
+    this.initWebSocket()
+  },
+  // 离开该层时执行
+  destroyed: function () {
+    // 清除计时器
+    clearInterval(this.test)
+    // 离开路由之后断开websocket连接
+    this.websock.close()
   },
   methods: {
-    historyEcharts () {
-      var myChart = echarts.init(document.getElementById('historyTable'))
+    // 初始化websocket
+    initWebSocket () {
+      const path = 'ws://192.168.100.93:8081/webSocket'
+      this.websock = new WebSocket(path)
+      this.websock.onmessage = this.websocketOnMessage
+      this.websock.onopen = this.websocketOnOpen
+      this.websock.onerror = this.websocketOnError
+      this.websock.onclose = this.websocketClose
+      // this.sendDevName(this.clickDev)
+      console.log('初始化成功')
+    },
+    // 连接建立
+    websocketOnOpen () {
+    },
+    // 连接建立失败重连
+    websocketOnError () {
+      this.initWebSocket()
+    },
+    // 数据接收
+    websocketOnMessage (e) {
+      console.log(e)
+      // console.log(data.data)
+      // if (e.data === 'false') {
+      //   console.log('null')
+      // } else {
+      //   let data = JSON.parse(e.data)
+      //   console.log(data)
+      //   if (data.devName === this.clickDev) {
+      //     this.totalButton = data['devSwitch']
+      //     if (data['on-off1'] === 1) {
+      //       this.button1 = true
+      //     } else {
+      //       this.button1 = false
+      //     }
+      //     if (data['on-off2'] === 1) {
+      //       this.button2 = true
+      //     } else {
+      //       this.button2 = false
+      //     }
+      //     if (data['on-off3'] === 1) {
+      //       this.button3 = true
+      //     } else {
+      //       this.button3 = false
+      //     }
+      //     if (data['on-off4'] === 1) {
+      //       this.button4 = true
+      //     } else {
+      //       this.button4 = false
+      //     }
+      //     if (data['on-off5'] === 1) {
+      //       this.button5 = true
+      //     } else {
+      //       this.button5 = false
+      //     }
+      //     if (data['on-off6'] === 1) {
+      //       this.button6 = true
+      //     } else {
+      //       this.button6 = false
+      //     }
+      //     if (data['on-off7'] === 1) {
+      //       this.button7 = true
+      //     } else {
+      //       this.button7 = false
+      //     }
+      //     if (data['on-off8'] === 1) {
+      //       this.button8 = true
+      //     } else {
+      //       this.button8 = false
+      //     }
+      //     // this.button1 = data['on-off1']
+      //     // this.button2 = data['on-off2']
+      //     // this.button3 = data['on-off3']
+      //     // this.button4 = data['on-off4']
+      //     // this.button5 = data['on-off5']
+      //     // this.button6 = data['on-off6']
+      //     // this.button7 = data['on-off7']
+      //     // this.button8 = data['on-off8']
+      //     this.changeTimeEcharts(data)
+      //   }
+      // }
+    },
+    // 数据发送
+    websocketSend (Data) {
+      this.websock.send(Data)
+    },
+    // 关闭
+    websocketClose () {
+      console.log('断开连接')
+    },
+    // 发送设备参数
+    sendDevName (devName) {
+      // let actions = {'devName': devName}
+      // console.log(actions)
+      // this.websocketSend(JSON.stringify(actions))
+      this.websocketSend('zzl')
+    },
+    realTimeEcharts () {
+      var myChart = echarts.init(document.getElementById('realTimeTable'))
       window.onresize = myChart.resize
       var option = {
         title: {
@@ -186,52 +211,6 @@ export default {
         ]
       }
       myChart.setOption(option)
-    },
-    // 分页初始化
-    openData (val) {
-      if (val) {
-        this.tableDataBegin = val.time
-        this.totalItems = this.tableDataBegin.length
-        if (this.totalItems > this.pageSize) {
-          for (let index = 0; index < this.pageSize; index++) {
-            this.tableDataEnd.push(this.tableDataBegin[index])
-          }
-          this.filterTableDataEnd = this.tableDataBegin
-          this.totalItems = this.tableDataBegin.length
-        } else {
-          this.tableDataEnd = this.tableDataBegin
-          this.filterTableDataEnd = this.tableDataBegin
-          this.totalItems = this.tableDataBegin.length
-        }
-        console.log('!!!!!!!!!!!', this.tableDataEnd)
-      }
-    },
-    // 分页功能
-    handleSizeChange (val) {
-      console.log(`每页 ${val} 条`)
-      this.pageSize = val
-      this.handleCurrentChange(this.currentPage)
-    },
-    handleCurrentChange (val) {
-      console.log(`当前页: ${val}`)
-      this.currentPage = val
-      // 需要判断是否检索
-      if (!this.flag) {
-        this.currentChangePage(this.tableDataEnd)
-      } else {
-        this.currentChangePage(this.filterTableDataEnd)
-      }
-    },
-    // 组件自带监控当前页码
-    currentChangePage (list) {
-      let from = (this.currentPage - 1) * this.pageSize
-      let to = this.currentPage * this.pageSize
-      this.tableDataEnd = []
-      for (; from < to; from++) {
-        if (list[from]) {
-          this.tableDataEnd.push(list[from])
-        }
-      }
     }
   }
 }
