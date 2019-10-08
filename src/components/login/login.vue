@@ -3,6 +3,7 @@
       <div class="login-picture">
         <a href="https://free.modao.cc/app/3rkxnjr01k3k0q3oce5po8q31wvpda#screen=sk0q3ocs96afkwz6g" target="_blank">墨刀样式</a>
         <a href="https://docs.qq.com/sheet/DVWFNV0ZESllORG1j?tab=BB08J2&c=A1A0A0" target="_blank">接口文档</a>
+        <a href="http://192.168.100.93:8081/swagger-ui.html" target="_blank">接口文档(最新版)</a>
         <div class="login-form" v-if="choose===1">
           <p class="title">用户登录</p>
           <p class="login-item error">{{inputError}}</p>
@@ -150,6 +151,8 @@ export default {
           console.log(body.data)
           if (body.data === 'success') {
             this.$message.success('登录成功')
+            // 存储本地用户名
+            sessionStorage.setItem('username', this.inputEmail)
             // 跳转主界面
             this.$router.push('/index')
           } else if (body.data === 'not exist') {

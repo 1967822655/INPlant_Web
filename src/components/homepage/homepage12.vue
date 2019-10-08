@@ -4,7 +4,7 @@
     <div style="height: 300px;width: 100%;background-color: white">
 
     </div>
-    <button @click="sendDevName()">XXXXXXXXXXXXXXxxx</button>
+    <button @click="sendDevName()">设备1发送</button>
     <div id="realTimeTable" style="height: 600px; width: 100%"></div>
   </div>
 </template>
@@ -15,29 +15,23 @@ export default {
   name: 'homepage12',
   data () {
     return {
-      time: [1, 2, 3, 4, 5, 6, 7],
-      temperature: [120, 132, 101, 134, 90, 230, 210],
-      humidity: [320, 332, 301, 334, 390, 330, 320],
-      CO2concentration: [220, 182, 191, 234, 290, 330, 310],
-      light: [150, 232, 201, 154, 190, 330, 410],
-      ph: [820, 932, 901, 934, 1290, 1330, 1320],
-      nutrientConcentration: [999, 1020, 528, 287, 398, 873, 256],
+      username: null,
+      time: [], // 时间
+      temperature: [], // 空气温度
+      humidity: [], // 空气湿度
+      CO2concentration: [], // 二氧化碳浓度
+      light: [], // 光照强度
+      ph: [], // ph值
+      nutrientConcentration: [], // 可溶盐浓度
       test: null
     }
   },
   mounted () {
+    this.username = sessionStorage.getItem('username')
+    // 拦截器
+    // if (!this.username || this.username === 'null') {
+    // }
     this.realTimeEcharts()
-    var _this = this
-    this.test = setInterval(function () {
-      _this.time.push(_this.time[_this.time.length - 1] + 1)
-      _this.temperature.push(_this.temperature[_this.temperature.length - 1] + 1)
-      _this.humidity.push(_this.humidity[_this.humidity.length - 1] + 1)
-      _this.CO2concentration.push(_this.CO2concentration[_this.CO2concentration.length - 1] + 1)
-      _this.light.push(_this.light[_this.light.length - 1] + 1)
-      _this.ph.push(_this.ph[_this.ph.length - 1] + 1)
-      _this.nutrientConcentration.push(_this.nutrientConcentration[_this.nutrientConcentration.length - 1] + 1)
-      _this.realTimeEcharts()
-    }, 2000)
     // websocket初始化
     this.initWebSocket()
   },
@@ -69,7 +63,16 @@ export default {
     },
     // 数据接收
     websocketOnMessage (e) {
-      console.log(e)
+      console.log(e.data)
+      let data = JSON.parse(e.data)
+      this.time.push(new Date().toString().split('GMT')[0])
+      this.temperature.push(data.temperature)
+      this.humidity.push(data.humidity)
+      this.CO2concentration.push(data.co2)
+      this.light.push(data.light_intensity)
+      this.ph.push(data.ph)
+      this.nutrientConcentration.push(data.ec)
+      this.realTimeEcharts()
       // console.log(data.data)
       // if (e.data === 'false') {
       //   console.log('null')
@@ -143,7 +146,7 @@ export default {
       // let actions = {'devName': devName}
       // console.log(actions)
       // this.websocketSend(JSON.stringify(actions))
-      this.websocketSend('zzl')
+      this.websocketSend('6af6188e14aa')
     },
     realTimeEcharts () {
       var myChart = echarts.init(document.getElementById('realTimeTable'))
