@@ -5,51 +5,79 @@
     </div>
     <el-divider></el-divider>
     <div class="deviceSettings-content" v-loading.fullscreen.lock="fullscreenLoading">
-      <el-row :gutter="10">
+      <el-row class="deviceSettings-switch" :gutter="10">
+        <el-col :span="8">
+          <el-card class="box-card" shadow="hover">
+            <el-tag class="card-name">风扇</el-tag>
+            <el-switch
+              v-model="fanSetAndValue"
+              active-color="#13ce66"
+              inactive-color="#ff4949"
+              @change="commitFanToServer()">
+            </el-switch>
+          </el-card>
+        </el-col>
+        <el-col :span="8">
+          <el-card class="box-card" shadow="hover">
+            <el-tag class="card-name">LED灯</el-tag>
+            <el-switch
+              v-model="ledSetAndValue"
+              active-color="#13ce66"
+              inactive-color="#ff4949"
+              @change="commitLedToServer()">
+            </el-switch>
+          </el-card>
+        </el-col>
+        <el-col :span="8">
+          <el-card class="box-card" shadow="hover">
+            <el-tag class="card-name">循环泵</el-tag>
+            <el-switch
+              v-model="pumpSetAndValue"
+              active-color="#13ce66"
+              inactive-color="#ff4949"
+              @change="commitPumpToServer()">
+            </el-switch>
+          </el-card>
+        </el-col>
+      </el-row>
+      <el-row  class="deviceSettings-input" :gutter="10">
         <el-col :span="8">
           <el-card class="box-card" shadow="hover">
             <el-tag class="card-name">营养液浓度(us/cm)</el-tag>
             <i class="el-icon-edit-outline card-edit" v-show="nutrientNotEdit" @click="nutrientNotEdit = !nutrientNotEdit"></i>
             <i class="el-icon-finished card-edit" v-show="!nutrientNotEdit" @click="commitNutrientToServer()"></i>
             <i class="el-icon-close card-edit" v-show="!nutrientNotEdit" @click="nutrientNotEdit = !nutrientNotEdit"></i>
-            <div class="block card-content">
-              <el-input
-                placeholder="请输入内容"
-                type="number"
-                v-model="nutrientSet"
-                :disabled="nutrientNotEdit">
-              </el-input>
-            </div>
+            <input
+              placeholder="请输入内容"
+              type="number"
+              v-model="nutrientSet"
+              :disabled="nutrientNotEdit">
           </el-card>
         </el-col>
         <el-col :span="8">
           <el-card class="box-card" shadow="hover">
-            <el-tag class="card-name">风扇</el-tag>
-            <i class="el-icon-setting card-edit" @click="fanNotEdit = !fanNotEdit"></i>
-            <div class="block card-content">
-              <el-switch
-                v-model="fanSetAndValue"
-                active-color="#13ce66"
-                inactive-color="#ff4949"
-                :disabled="fanNotEdit"
-                @change="commitFanToServer()">
-              </el-switch>
-            </div>
+            <el-tag class="card-name">光照时间(s)</el-tag>
+            <i class="el-icon-edit-outline card-edit" v-show="lightNotEdit" @click="lightNotEdit = !lightNotEdit"></i>
+            <i class="el-icon-finished card-edit" v-show="!lightNotEdit" @click="commitLightToServer()"></i>
+            <i class="el-icon-close card-edit" v-show="!lightNotEdit" @click="lightNotEdit = !lightNotEdit"></i>
+            <input
+              placeholder="-"
+              type="number"
+              v-model="lightSet"
+              :disabled="lightNotEdit">
           </el-card>
         </el-col>
         <el-col :span="8">
           <el-card class="box-card" shadow="hover">
-            <el-tag class="card-name">LED灯</el-tag>
-            <i class="el-icon-setting card-edit"  @click="lightNotEdit = !lightNotEdit"></i>
-            <div class="block card-content">
-              <el-switch
-                v-model="lightSetAndValue"
-                active-color="#13ce66"
-                inactive-color="#ff4949"
-                :disabled="lightNotEdit"
-                @change="commitLightToServer()">
-              </el-switch>
-            </div>
+            <el-tag class="card-name">ph值</el-tag>
+            <i class="el-icon-edit-outline card-edit" v-show="phNotEdit" @click="phNotEdit = !phNotEdit"></i>
+            <i class="el-icon-finished card-edit" v-show="!phNotEdit" @click="commitPhToServer()"></i>
+            <i class="el-icon-close card-edit" v-show="!phNotEdit" @click="phNotEdit = !phNotEdit"></i>
+            <input
+              placeholder="请输入内容"
+              type="number"
+              v-model="phSet"
+              :disabled="phNotEdit">
           </el-card>
         </el-col>
       </el-row>
@@ -62,19 +90,20 @@ import data from '../cache'
 export default {
   name: 'homepage2',
   mounted () {
-    //    load data of nutrient light fan
-    // websocket初始化
+    // websocket初始化 -> load data of nutrient light fan
     this.initWebSocket()
   },
   data () {
     return {
-      nutrientValue: 0,
       nutrientSet: 0,
+      lightSet: '-',
+      phSet: 0,
       fanSetAndValue: false,
-      lightSetAndValue: false,
+      ledSetAndValue: false,
+      pumpSetAndValue: false,
       nutrientNotEdit: true,
-      fanNotEdit: true,
       lightNotEdit: true,
+      phNotEdit: true,
       fullscreenLoading: false
     }
   },
@@ -89,10 +118,10 @@ export default {
       this.websock.onclose = this.websocketClose
       // this.sendDevName(this.clickDev)
       console.log('初始化成功')
-      this.websocketSend()
     },
     // 连接建立
     websocketOnOpen () {
+      this.websocketSend()
     },
     // 连接建立失败重连
     websocketOnError () {
@@ -106,10 +135,15 @@ export default {
       } else {
         let data = JSON.parse(e.data)
         console.log(data)
-        this.nutrientSet = data.ec
-        this.nutrientValue = data.ec
+        if (this.nutrientNotEdit) {
+          this.nutrientSet = data.ec
+        }
+        if (this.phNotEdit) {
+          this.phSet = data.ph
+        }
         this.fanSetAndValue = Boolean(data['fan'])
-        this.fanSetAndValue = Boolean(data['LED'])
+        this.ledSetAndValue = Boolean(data['LED'])
+        this.pumpSetAndValue = Boolean(data['pump'])
       }
     },
     // 数据发送
@@ -124,7 +158,25 @@ export default {
      * 1.check inputvalue -> commit to server ->load
      * 3.display true value
      */
+    // 发送给服务器
+    commitToServer (msg) {
+      var upCtrl = new FormData()
+      //  this.upCtrl.append('username', localStorage.getItem('username'))
+      upCtrl.append('username', '1399472680@qq.com')
+      upCtrl.append('deviceID', '6af6188e14aa')
+      upCtrl.append('msg', msg)
+      this.axios.post(data.serverSrc + '/dev/downctrl', upCtrl).then(body => {
+        console.log(body.data)
+        this.fullscreenLoading = !this.fullscreenLoading
+        this.$notify.info({
+          title: '消息',
+          message: '提交成功'
+        }, 1000)
+      })
+    },
+    // 数值类型
     commitNutrientToServer () {
+      this.nutrientNotEdit = !this.nutrientNotEdit
       this.fullscreenLoading = !this.fullscreenLoading
       console.log('commitNutrientToServer')
       var newNutrient = parseInt(this.nutrientSet)
@@ -134,65 +186,76 @@ export default {
           'ec': newNutrient
         })
         console.log(msg)
-        let newNutrientCtl = new FormData()
-        newNutrientCtl.append('username', '1399472680@qq.com')
-        newNutrientCtl.append('deviceID', '6af6188e14aa')
-        newNutrientCtl.append('msg', msg)
-        this.axios.post(data.serverSrc + '/dev/downctrl', newNutrientCtl).then(body => {
-          console.log(body.data)
-          this.fullscreenLoading = !this.fullscreenLoading
-          this.nutrientNotEdit = !this.nutrientNotEdit
-          //          this.$notify({
-          //            title: 'tip-temp',
-          //            message: body.data
-          //          })
-          // type: 'warning' 'error'
-        })
+        this.commitToServer(msg)
+      } else {
+        this.fullscreenLoading = !this.fullscreenLoading
+        this.$notify.error({
+          title: '错误',
+          message: '输入数值无效'
+        }, 1000)
       }
     },
+    commitLightToServer () {
+      this.lightNotEdit = !this.lightNotEdit
+      this.fullscreenLoading = !this.fullscreenLoading
+      console.log('commitNutrientToServer')
+      var newLight = parseInt(this.nutrientSet)
+      if (newLight >= 0) {
+        console.log(newLight)
+        var msg = JSON.stringify({
+          'light': newLight
+        })
+        console.log(msg)
+        this.commitToServer(msg)
+      } else {
+        this.fullscreenLoading = !this.fullscreenLoading
+        this.$notify.error({
+          title: '错误',
+          message: '输入数值无效'
+        }, 1000)
+      }
+    },
+    commitPhToServer () {
+      this.phNotEdit = !this.phNotEdit
+      this.fullscreenLoading = !this.fullscreenLoading
+      console.log('commitNutrientToServer')
+      var newPh = parseInt(this.nutrientSet)
+      if (newPh >= 0 && newPh <= 14) {
+        console.log(newPh)
+        var msg = JSON.stringify({
+          'ph': newPh
+        })
+        console.log(msg)
+        this.commitToServer(msg)
+      } else {
+        this.fullscreenLoading = !this.fullscreenLoading
+        this.$notify.error({
+          title: '错误',
+          message: '输入数值无效'
+        }, 1000)
+      }
+    },
+    // 开关类型
     commitFanToServer () {
       this.fullscreenLoading = !this.fullscreenLoading
-      console.log('commitFanToServer')
-      console.log(this.fanSetAndValue)
       var msg = JSON.stringify({
         'fan': this.fanSetAndValue ? 1 : 0
       })
-      console.log(msg)
-      let newNutrientCtl = new FormData()
-      newNutrientCtl.append('username', '1399472680@qq.com')
-      newNutrientCtl.append('deviceID', '6af6188e14aa')
-      newNutrientCtl.append('msg', msg)
-      this.axios.post(data.serverSrc + '/dev/downctrl', newNutrientCtl).then(body => {
-        console.log(body.data)
-        this.fullscreenLoading = !this.fullscreenLoading
-        this.fanNotEdit = !this.fanNotEdit
-        //        this.$notify({
-        //          title: 'tip-temp',
-        //          message: body.data
-        //        })
-      })
+      this.commitToServer(msg)
     },
-    commitLightToServer () {
+    commitLedToServer () {
       this.fullscreenLoading = !this.fullscreenLoading
-      console.log('commitLightToServer')
-      console.log(this.lightSetAndValue)
       var msg = JSON.stringify({
-        'LED': this.lightSetAndValue ? 1 : 0
+        'LED': this.ledSetAndValue ? 1 : 0
       })
-      console.log(msg)
-      let newNutrientCtl = new FormData()
-      newNutrientCtl.append('username', '1399472680@qq.com')
-      newNutrientCtl.append('deviceID', '6af6188e14aa')
-      newNutrientCtl.append('msg', msg)
-      this.axios.post(data.serverSrc + '/dev/downctrl', newNutrientCtl).then(body => {
-        console.log(body.data)
-        this.fullscreenLoading = !this.fullscreenLoading
-        this.lightNotEdit = !this.lightNotEdit
-        //        this.$notify({
-        //          title: 'tip-temp',
-        //          message: body.data
-        //        })
+      this.commitToServer(msg)
+    },
+    commitPumpToServer () {
+      this.fullscreenLoading = !this.fullscreenLoading
+      var msg = JSON.stringify({
+        'pump': this.pumpSetAndValue ? 1 : 0
       })
+      this.commitToServer(msg)
     }
   }
 }
@@ -209,37 +272,64 @@ export default {
     width: 100%;
     position: relative;
   }
-  .deviceSettings-content .box-card {
-    height: 200px;
-    background-color: gainsboro;
+  /* 谷歌 */
+  #deviceSettings .deviceSettings-content input::-webkit-outer-spin-button,
+  #deviceSettings .deviceSettings-content input::-webkit-inner-spin-button {
+    -webkit-appearance: none;
+    appearance: none;
+    margin: 0;
   }
-  .box-card el-card__body {
-    height: 100%;
+  /* 火狐 */
+  #deviceSettings .deviceSettings-content input{
+    -moz-appearance:textfield;
   }
-  .box-card .card-name {
-    border: none;
+
+  .deviceSettings-switch .box-card {
+    margin-bottom: 20px;
+    background-color: #FFFFF0;
   }
-  .box-card .card-edit {
+  .deviceSettings-switch .box-card .card-name{
+    margin: 0;
+    font-size: 20px;
+    letter-spacing: 0.1em;
+  }
+  .deviceSettings-switch .box-card .el-switch {
     float: right;
+    margin-top: 10px;
+  }
+  .deviceSettings-input .box-card {
+    background-color: #87CEFA;
+  }
+  .deviceSettings-input .box-card .card-name{
+    margin: 0;
+    font-size: 13px;
+    letter-spacing: 0.1em;
+  }
+  .deviceSettings-input .box-card .card-edit{
+    float: right;
+    color: white;
+    font-size: 1.3em;
+    margin-left: 5px;
+    margin-top: 5px;
+  }
+  .deviceSettings-input .box-card .card-edit{
+    float: right;
+    color: white;
+    font-size: 1.3em;
+    margin-left: 5px;
+  }
+  .deviceSettings-input .box-card input {
+    width: 100px;
     margin-left: 10px;
-    font-size: 1.5em;
+    font-size: 23px;
+    color: #222222;
+    border-radius: 5px;
+    border: 1px solid #d9ecff;
   }
-  .box-card .card-content {
-    height: 150px;
-    float: right;
-  }
-  .box-card .card-content .el-input input{
-    margin-top: 100px;
-    outline: none;
-    color: black;
-  }
-  .box-card .card-content .el-input input:disabled {
-    margin-top: 130px;
-    outline: none;
-    color: black;
-  }
-  .box-card .card-content .el-switch {
-    margin-top: 130px;
-    margin-right: 0;
+  .deviceSettings-input .box-card input:disabled {
+    background:none;
+    outline:none;
+    border:none;
+    font-size: 25px;
   }
 </style>
