@@ -1,9 +1,13 @@
 <template>
     <div class="container">
-      <div class="login-picture">
+      <div class="header" style="">
+        <img class="app-logo" src="../../assets/logo.png" />
+        <h1>智慧种植系统平台</h1>
         <a href="https://free.modao.cc/app/3rkxnjr01k3k0q3oce5po8q31wvpda#screen=sk0q3ocs96afkwz6g" target="_blank">墨刀样式</a>
         <a href="https://docs.qq.com/sheet/DVWFNV0ZESllORG1j?tab=BB08J2&c=A1A0A0" target="_blank">接口文档</a>
         <a href="http://192.168.100.93:8081/swagger-ui.html" target="_blank">接口文档(最新版)</a>
+      </div>
+      <div class="login-picture">
         <div class="login-form" v-if="choose===1">
           <p class="title">用户登录</p>
           <p class="login-item error">{{inputError}}</p>
@@ -136,6 +140,7 @@ export default {
     },
     // 登录
     login () {
+      this.$router.push('/index')
       // console.log(this.inputEmail + this.inputPassword)
       if (!this.inputEmail) {
         this.$message.error('尚未填写邮箱')
@@ -330,19 +335,38 @@ export default {
     float: left;
     position: relative;
   }
+  .container .header {
+    padding: 15px 20% 10px;
+    height: 40px;
+  }
+  .container .header .app-logo {
+    width: 30px;
+  }
+  .container .header > h1 {
+    display: inline;
+    font-size: 1.5em;
+    height:30px;
+    line-height:30px;
+    overflow:hidden;
+  }
+  .container .header > a {
+    float: right;
+    padding-top: 15px;
+    padding-left: 10px;
+  }
   .container .login-picture {
     height: 100%;
     width: 100%;
-    background: beige;
-    /*background-image: url(../../assets/banner.jpg);*/
-    /*background-repeat: no-repeat;*/
-    /*background-size: 100% 100%;*/
+    background: linear-gradient(120deg, lightskyblue, paleturquoise);
+    background-image: url(../../assets/login-bgc.jpg);
+    background-repeat: no-repeat;
+    background-size: 100% 100%;
   }
   .container .login-form {
     width: 25%;
     height: 330px;
     position: absolute;
-    top: 25%;
+    top: 30%;
     left: 55%;
     overflow: hidden;
     background:white;
