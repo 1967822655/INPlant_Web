@@ -1,10 +1,63 @@
 <template>
-  <div id="deviceSettings">
-    <div class="deviceSettings-title">
+  <div class="module">
+    <div class="module-title">
       <p>设备调节</p>
     </div>
     <el-divider></el-divider>
-    <div class="deviceSettings-content" v-loading.fullscreen.lock="fullscreenLoading">
+    <div class="module-content" v-loading="fullscreenLoading">
+      <el-row  class="deviceSettings-input" :gutter="10">
+        <el-col :span="8">
+          <el-card class="box-card" shadow="hover">
+            <div>
+              <el-tag class="card-name">营养液浓度(us/cm)</el-tag>
+              <i class="el-icon-edit-outline card-edit" v-show="nutrientNotEdit" @click="nutrientNotEdit = !nutrientNotEdit"></i>
+              <i class="el-icon-finished card-edit" v-show="!nutrientNotEdit" @click="commitNutrientToServer()"></i>
+              <i class="el-icon-close card-edit" v-show="!nutrientNotEdit" @click="nutrientNotEdit = !nutrientNotEdit"></i>
+            </div>
+            <div>
+              <input
+                placeholder="请输入内容"
+                type="number"
+                v-model="nutrientSet"
+                :disabled="nutrientNotEdit">
+            </div>
+          </el-card>
+        </el-col>
+        <el-col :span="8">
+          <el-card class="box-card" shadow="hover">
+            <div>
+              <el-tag class="card-name">光照时间(s)</el-tag>
+              <i class="el-icon-edit-outline card-edit" v-show="lightNotEdit" @click="lightNotEdit = !lightNotEdit"></i>
+              <i class="el-icon-finished card-edit" v-show="!lightNotEdit" @click="commitLightToServer()"></i>
+              <i class="el-icon-close card-edit" v-show="!lightNotEdit" @click="lightNotEdit = !lightNotEdit"></i>
+            </div>
+            <div>
+              <input
+                placeholder="请输入内容"
+                type="number"
+                v-model="lightSet"
+                :disabled="lightNotEdit">
+            </div>
+          </el-card>
+        </el-col>
+        <el-col :span="8">
+          <el-card class="box-card" shadow="hover">
+            <div>
+              <el-tag class="card-name">ph值</el-tag>
+              <i class="el-icon-edit-outline card-edit" v-show="phNotEdit" @click="phNotEdit = !phNotEdit"></i>
+              <i class="el-icon-finished card-edit" v-show="!phNotEdit" @click="commitPhToServer()"></i>
+              <i class="el-icon-close card-edit" v-show="!phNotEdit" @click="phNotEdit = !phNotEdit"></i>
+            </div>
+            <div>
+              <input
+                placeholder="请输入内容"
+                type="number"
+                v-model="phSet"
+                :disabled="phNotEdit">
+            </div>
+          </el-card>
+        </el-col>
+      </el-row>
       <el-row class="deviceSettings-switch" :gutter="10">
         <el-col :span="8">
           <el-card class="box-card" shadow="hover">
@@ -40,47 +93,6 @@
           </el-card>
         </el-col>
       </el-row>
-      <el-row  class="deviceSettings-input" :gutter="10">
-        <el-col :span="8">
-          <el-card class="box-card" shadow="hover">
-            <el-tag class="card-name">营养液浓度(us/cm)</el-tag>
-            <i class="el-icon-edit-outline card-edit" v-show="nutrientNotEdit" @click="nutrientNotEdit = !nutrientNotEdit"></i>
-            <i class="el-icon-finished card-edit" v-show="!nutrientNotEdit" @click="commitNutrientToServer()"></i>
-            <i class="el-icon-close card-edit" v-show="!nutrientNotEdit" @click="nutrientNotEdit = !nutrientNotEdit"></i>
-            <input
-              placeholder="请输入内容"
-              type="number"
-              v-model="nutrientSet"
-              :disabled="nutrientNotEdit">
-          </el-card>
-        </el-col>
-        <el-col :span="8">
-          <el-card class="box-card" shadow="hover">
-            <el-tag class="card-name">光照时间(s)</el-tag>
-            <i class="el-icon-edit-outline card-edit" v-show="lightNotEdit" @click="lightNotEdit = !lightNotEdit"></i>
-            <i class="el-icon-finished card-edit" v-show="!lightNotEdit" @click="commitLightToServer()"></i>
-            <i class="el-icon-close card-edit" v-show="!lightNotEdit" @click="lightNotEdit = !lightNotEdit"></i>
-            <input
-              placeholder="-"
-              type="number"
-              v-model="lightSet"
-              :disabled="lightNotEdit">
-          </el-card>
-        </el-col>
-        <el-col :span="8">
-          <el-card class="box-card" shadow="hover">
-            <el-tag class="card-name">ph值</el-tag>
-            <i class="el-icon-edit-outline card-edit" v-show="phNotEdit" @click="phNotEdit = !phNotEdit"></i>
-            <i class="el-icon-finished card-edit" v-show="!phNotEdit" @click="commitPhToServer()"></i>
-            <i class="el-icon-close card-edit" v-show="!phNotEdit" @click="phNotEdit = !phNotEdit"></i>
-            <input
-              placeholder="请输入内容"
-              type="number"
-              v-model="phSet"
-              :disabled="phNotEdit">
-          </el-card>
-        </el-col>
-      </el-row>
     </div>
   </div>
 </template>
@@ -96,7 +108,7 @@ export default {
   data () {
     return {
       nutrientSet: 0,
-      lightSet: '-',
+      lightSet: 0,
       phSet: 0,
       fanSetAndValue: false,
       ledSetAndValue: false,
@@ -165,13 +177,21 @@ export default {
       upCtrl.append('username', '1399472680@qq.com')
       upCtrl.append('deviceID', '6af6188e14aa')
       upCtrl.append('msg', msg)
-      this.axios.post(data.serverSrc + '/dev/downctrl', upCtrl).then(body => {
+      // 超时2min
+      this.axios.post(data.serverSrc + '/dev/downctrl', upCtrl, {timeout: 1000 * 6 * 2}).then(body => {
         console.log(body.data)
         this.fullscreenLoading = !this.fullscreenLoading
         this.$notify.info({
           title: '消息',
           message: '提交成功'
-        }, 1000)
+        })
+      }).catch(() => {
+        console.log('超时')
+        this.fullscreenLoading = !this.fullscreenLoading
+        this.$notify.error({
+          title: '消息',
+          message: '提交超时'
+        })
       })
     },
     // 数值类型
@@ -262,28 +282,10 @@ export default {
 </script>
 
 <style scoped>
-  #deviceSettings {
-    background: white;
-    width: 100%;
-    margin: 5px;
-    padding: 20px;
+  @import "../../style/module.css";
+  .box-card {
+    margin-bottom: 20px;
   }
-  #deviceSettings .deviceSettings-content {
-    width: 100%;
-    position: relative;
-  }
-  /* 谷歌 */
-  #deviceSettings .deviceSettings-content input::-webkit-outer-spin-button,
-  #deviceSettings .deviceSettings-content input::-webkit-inner-spin-button {
-    -webkit-appearance: none;
-    appearance: none;
-    margin: 0;
-  }
-  /* 火狐 */
-  #deviceSettings .deviceSettings-content input{
-    -moz-appearance:textfield;
-  }
-
   .deviceSettings-switch .box-card {
     margin-bottom: 20px;
     background-color: #FFFFF0;
@@ -320,9 +322,9 @@ export default {
   }
   .deviceSettings-input .box-card input {
     width: 100px;
-    margin-left: 10px;
+    margin-top: 10px;
     font-size: 23px;
-    color: #222222;
+    color: white;
     border-radius: 5px;
     border: 1px solid #d9ecff;
   }

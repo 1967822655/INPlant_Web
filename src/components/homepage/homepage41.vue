@@ -1,10 +1,10 @@
 <template>
-  <div id="modelTraining">
-    <div class="modelTraining-title">
+  <div class="module">
+    <div class="module-title">
       <p>训练模型</p>
     </div>
     <el-divider></el-divider>
-    <div class="modelTraining-content">
+    <div class="module-content">
       <el-table
         :data="modelTrainingTableData">
         <el-table-column
@@ -111,22 +111,7 @@ export default {
 </script>
 
 <style scoped>
-  #modelTraining {
-    background: white;
-    width: 100%;
-    margin: 5px;
-    padding: 20px;
-  }
-  #modelTraining .modelTraining-content {
-    width: 100%;
-    position: relative;
-  }
-  #modelTraining .modelTraining-content > el-table{
-    width: 100%;
-  }
-  .modelTraining-content > el-table > el-table-column {
-    width: 20%;
-  }
+  @import "../../style/module.css";
   .modelTraining-upload {
     width: 100%;
     position: relative;

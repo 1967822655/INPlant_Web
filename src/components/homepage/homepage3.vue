@@ -1,10 +1,10 @@
 <template>
-  <div id="thresholdSetting">
-    <div class="thresholdSetting-title">
+  <div class="module">
+    <div class="module-title">
       <p>阈值设置</p>
     </div>
     <el-divider></el-divider>
-    <div class="thresholdSetting-content">
+    <div class="module-content">
       <el-table
         v-loading="loadingTableData"
         :data="thresholdTableData">
@@ -181,21 +181,7 @@ export default {
 </script>
 
 <style scoped>
-  #thresholdSetting {
-    background: white;
-    width: 100%;
-    margin: 5px;
-    padding: 20px;
-  }
-  #thresholdSetting .thresholdSetting-content {
-    width: 100%;
-  }
-  #thresholdSetting .thresholdSetting-content > el-table{
-    width: 100%;
-  }
-  .thresholdSetting-content > el-table > el-table-column {
-    width: 20%;
-  }
+  @import "../../style/module.css";
   el-dialog el-input {
     color: black;
     -webkit-text-fill-color: #7d7e80;
