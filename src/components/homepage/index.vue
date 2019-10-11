@@ -34,15 +34,15 @@
 <!--      <canvas id="canvas" width="500" height="500">cccc</canvas>-->
       <div class="square" v-for="number in numbers" :key="number.name">
         <div style="font-size: 38px">
-          种类：{{number.name}}
+          种类：{{number.name}}{{username}}
         </div>
-        <div>实验台ID：{{number.deviceID}}</div>
+        <div>实验台ID：{{number.deviceid}}</div>
         <div>培育天数：{{number.day}}天</div>
         <div>描述：<textarea v-model="number.msg"></textarea></div>
+        <el-button type="success" @click="chooseDevice(number.deviceid)">进入实验室</el-button>
       </div>
       <div class="el-icon-circle-plus-outline" style="font-size: 300px;color: #50d7ba"></div>
       <div style="clear: both"></div>
-      <el-button type="success" @click="enterInterface">进入主页</el-button>
     </el-main>
   </el-container>
 </template>
@@ -63,14 +63,22 @@ export default {
   mounted () {
     // 获取用户名
     this.username = sessionStorage.getItem('username')
+    console.log(sessionStorage.getItem('username'))
     let showdev = new FormData()
     showdev.append('username', this.username)
     this.axios.post(data.serverSrc + '/userdev/showdev', showdev).then(body => {
       console.log(body)
+      this.numbers = body.data
     })
   },
   methods: {
+    chooseDevice (deviceID) {
+      // 存储选中的设备id
+      sessionStorage.setItem('chooseDevice', deviceID)
+      this.enterInterface()
+    },
     enterInterface () {
+      // 跳转单个实验台详细界面
       this.$router.push('/homepage')
     }
   }

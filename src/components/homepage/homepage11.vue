@@ -1,6 +1,6 @@
 <template>
   <div style="width: 100%">
-    <div>历史数据</div>
+    <p>历史数据</p>
     <div id="historyTable" style="height: 600px; width: 100%"></div>
     <el-table
       :data="tableDataEnd"

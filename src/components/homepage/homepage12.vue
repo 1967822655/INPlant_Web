@@ -1,10 +1,36 @@
 <template>
   <div style="width: 100%">
     <div>实时数据</div>
-    <div style="height: 300px;width: 100%;background-color: white">
-
+    <div class="dataBox">
+      <div class="row">
+        <div class="col">
+          <p class="word">空气温度：</p>
+          <div class="data">{{this.temperature[this.temperature.length-1]}}℃</div>
+        </div>
+        <div class="col">
+          <p class="word">空气湿度：</p>
+          <div class="data">{{this.humidity[this.humidity.length-1]}}%</div>
+        </div>
+        <div class="col">
+          <p class="word">光照强度：</p>
+          <div class="data">{{this.light[this.light.length-1]}}LUX</div>
+        </div>
+      </div>
+      <div class="row">
+        <div class="col">
+          <p class="word">可溶盐浓度：</p>
+          <div class="data">{{this.nutrientConcentration[this.nutrientConcentration.length-1]}}mS/cm</div>
+        </div>
+        <div class="col">
+          <p class="word">ph值：</p>
+          <div class="data">{{this.ph[this.ph.length-1]}}</div>
+        </div>
+        <div class="col">
+          <p class="word">二氧化碳浓度：</p>
+          <div class="data">{{this.CO2concentration[this.CO2concentration.length-1]}}PPM</div>
+        </div>
+      </div>
     </div>
-    <button @click="sendDevName()">设备1发送</button>
     <div id="realTimeTable" style="height: 600px; width: 100%"></div>
   </div>
 </template>
@@ -22,23 +48,23 @@ export default {
       CO2concentration: [], // 二氧化碳浓度
       light: [], // 光照强度
       ph: [], // ph值
-      nutrientConcentration: [], // 可溶盐浓度
-      test: null
+      nutrientConcentration: [] // 可溶盐浓度
     }
+  },
+  created () {
   },
   mounted () {
     this.username = sessionStorage.getItem('username')
     // 拦截器
     // if (!this.username || this.username === 'null') {
     // }
-    this.realTimeEcharts()
     // websocket初始化
     this.initWebSocket()
+    this.realTimeEcharts()
+    // this.sendDevName(sessionStorage.getItem('chooseDevice'))
   },
   // 离开该层时执行
   destroyed: function () {
-    // 清除计时器
-    clearInterval(this.test)
     // 离开路由之后断开websocket连接
     this.websock.close()
   },
@@ -52,13 +78,16 @@ export default {
       this.websock.onerror = this.websocketOnError
       this.websock.onclose = this.websocketClose
       // this.sendDevName(this.clickDev)
-      console.log('初始化成功')
+      // this.websocketSend(sessionStorage.getItem('chooseDevice'))
     },
     // 连接建立
     websocketOnOpen () {
+      console.log('初始化成功')
+      this.sendDevName(sessionStorage.getItem('chooseDevice'))
     },
     // 连接建立失败重连
     websocketOnError () {
+      // 断线重连
       this.initWebSocket()
     },
     // 数据接收
@@ -71,67 +100,16 @@ export default {
       this.CO2concentration.push(data.co2)
       this.light.push(data.light_intensity)
       this.ph.push(data.ph)
+      if (this.time.length > 20) {
+        this.time.splice(0, 1)
+        this.temperature.splice(0, 1)
+        this.humidity.splice(0, 1)
+        this.CO2concentration.splice(0, 1)
+        this.light.splice(0, 1)
+        this.ph.splice(0, 1)
+      }
       this.nutrientConcentration.push(data.ec)
       this.realTimeEcharts()
-      // console.log(data.data)
-      // if (e.data === 'false') {
-      //   console.log('null')
-      // } else {
-      //   let data = JSON.parse(e.data)
-      //   console.log(data)
-      //   if (data.devName === this.clickDev) {
-      //     this.totalButton = data['devSwitch']
-      //     if (data['on-off1'] === 1) {
-      //       this.button1 = true
-      //     } else {
-      //       this.button1 = false
-      //     }
-      //     if (data['on-off2'] === 1) {
-      //       this.button2 = true
-      //     } else {
-      //       this.button2 = false
-      //     }
-      //     if (data['on-off3'] === 1) {
-      //       this.button3 = true
-      //     } else {
-      //       this.button3 = false
-      //     }
-      //     if (data['on-off4'] === 1) {
-      //       this.button4 = true
-      //     } else {
-      //       this.button4 = false
-      //     }
-      //     if (data['on-off5'] === 1) {
-      //       this.button5 = true
-      //     } else {
-      //       this.button5 = false
-      //     }
-      //     if (data['on-off6'] === 1) {
-      //       this.button6 = true
-      //     } else {
-      //       this.button6 = false
-      //     }
-      //     if (data['on-off7'] === 1) {
-      //       this.button7 = true
-      //     } else {
-      //       this.button7 = false
-      //     }
-      //     if (data['on-off8'] === 1) {
-      //       this.button8 = true
-      //     } else {
-      //       this.button8 = false
-      //     }
-      //     // this.button1 = data['on-off1']
-      //     // this.button2 = data['on-off2']
-      //     // this.button3 = data['on-off3']
-      //     // this.button4 = data['on-off4']
-      //     // this.button5 = data['on-off5']
-      //     // this.button6 = data['on-off6']
-      //     // this.button7 = data['on-off7']
-      //     // this.button8 = data['on-off8']
-      //     this.changeTimeEcharts(data)
-      //   }
-      // }
     },
     // 数据发送
     websocketSend (Data) {
@@ -142,11 +120,12 @@ export default {
       console.log('断开连接')
     },
     // 发送设备参数
-    sendDevName (devName) {
+    sendDevName (chooseDevice) {
       // let actions = {'devName': devName}
       // console.log(actions)
       // this.websocketSend(JSON.stringify(actions))
-      this.websocketSend('6af6188e14aa')
+      console.log(chooseDevice)
+      this.websocketSend(chooseDevice)
     },
     realTimeEcharts () {
       var myChart = echarts.init(document.getElementById('realTimeTable'))
@@ -220,5 +199,24 @@ export default {
 </script>
 
 <style scoped>
-
+  .dataBox {
+    height: 300px;
+    width: 100%;
+    background-color: white;
+  }
+  .row {
+    display: flex;
+    height: 50%;
+    width: 100%;
+  }
+  .col {
+    width: 33.33%;
+  }
+  .word {
+    font-size: 18px;
+  }
+  .data {
+    font-weight: bold;
+    font-size: 45px;
+  }
 </style>

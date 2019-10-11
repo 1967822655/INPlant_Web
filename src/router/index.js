@@ -31,5 +31,6 @@ export default new Router({
       name: 'homepage',
       component: homepage
     }
-  ]
+  ],
+  mode: 'history'
 })

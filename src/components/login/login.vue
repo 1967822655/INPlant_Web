@@ -140,7 +140,6 @@ export default {
     },
     // 登录
     login () {
-      this.$router.push('/index')
       // console.log(this.inputEmail + this.inputPassword)
       if (!this.inputEmail) {
         this.$message.error('尚未填写邮箱')
@@ -155,11 +154,9 @@ export default {
         this.axios.post(data.serverSrc + '/user/login', registerParam).then(body => {
           console.log(body.data)
           if (body.data === 'success') {
+            sessionStorage.setItem('username', this.inputEmail)// 存储本地用户名
             this.$message.success('登录成功')
-            // 存储本地用户名
-            sessionStorage.setItem('username', this.inputEmail)
-            // 跳转主界面
-            this.$router.push('/index')
+            this.$router.push('/index')// 跳转主界面
           } else if (body.data === 'not exist') {
             this.$message.error('用户名不存在')
             this.inputEmail = ''
