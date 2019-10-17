@@ -161,6 +161,7 @@ export default {
     // 数据发送
     websocketSend () {
       this.websock.send('6af6188e14aa')
+      //  this.websock.send(sessionStorage.getItem('chooseDevice'))
     },
     // 关闭
     websocketClose () {
@@ -173,8 +174,9 @@ export default {
     // 发送给服务器
     commitToServer (msg) {
       var upCtrl = new FormData()
-      //  this.upCtrl.append('username', localStorage.getItem('username'))
-      upCtrl.append('username', '1399472680@qq.com')
+      //  upCtrl.append('username', localStorage.getItem('username'))
+      upCtrl.append('deviceID', sessionStorage.getItem('chooseDevice'))
+      //  upCtrl.append('username', '1399472680@qq.com')
       upCtrl.append('deviceID', '6af6188e14aa')
       upCtrl.append('msg', msg)
       // 超时2min
@@ -186,11 +188,11 @@ export default {
           message: '提交成功'
         })
       }).catch(() => {
-        console.log('超时')
+        console.log('出错')
         this.fullscreenLoading = !this.fullscreenLoading
         this.$notify.error({
           title: '消息',
-          message: '提交超时'
+          message: '提交出错'
         })
       })
     },
@@ -324,7 +326,7 @@ export default {
     width: 100px;
     margin-top: 10px;
     font-size: 23px;
-    color: white;
+    color: black;
     border-radius: 5px;
     border: 1px solid #d9ecff;
   }
@@ -333,5 +335,6 @@ export default {
     outline:none;
     border:none;
     font-size: 25px;
+    color: white;
   }
 </style>
