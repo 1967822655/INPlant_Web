@@ -1,6 +1,18 @@
 <template>
   <div style="width: 100%">
     <p>历史数据</p>
+    <span class="demonstration">查看的时间：</span>
+    <el-date-picker
+      v-model="dateTime"
+      type="daterange"
+      align="right"
+      unlink-panels
+      range-separator="至"
+      start-placeholder="开始日期"
+      end-placeholder="结束日期"
+      :picker-options="pickerOptions">
+    </el-date-picker>
+    <el-button type="primary buttonSize" @click="searchFromTime()">确定</el-button>
     <div id="historyTable" style="height: 600px; width: 100%"></div>
     <el-table
       :data="tableDataEnd"
@@ -20,7 +32,7 @@
         min-width="100"
         height="150">
         <template slot-scope="scope">
-          <span size="small">{{scope.row.temperature}}</span>
+          <span size="small">{{scope.row.temp}}℃</span>
         </template>
       </el-table-column>
       <el-table-column
@@ -29,7 +41,7 @@
         min-width="100"
         height="150">
         <template slot-scope="scope">
-          <span size="small">{{scope.row.humidity}}</span>
+          <span size="small">{{scope.row.rh}}%</span>
         </template>
       </el-table-column>
       <el-table-column
@@ -38,7 +50,7 @@
         min-width="100"
         height="150">
         <template slot-scope="scope">
-          <span size="small">{{scope.row.CO2concentration}}</span>
+          <span size="small">{{scope.row.co2}}PPM</span>
         </template>
       </el-table-column>
       <el-table-column
@@ -47,7 +59,7 @@
         min-width="100"
         height="150">
         <template slot-scope="scope">
-          <span size="small">{{scope.row.light}}</span>
+          <span size="small">{{scope.row.light}}LUX</span>
         </template>
       </el-table-column>
       <el-table-column
@@ -65,7 +77,7 @@
         min-width="100"
         height="150">
         <template slot-scope="scope">
-          <span size="small">{{scope.row.nutrientConcentration}}</span>
+          <span size="small">{{scope.row.ec}}mS/cm</span>
         </template>
       </el-table-column>
     </el-table>
@@ -85,17 +97,46 @@
 
 <script>
 import echarts from 'echarts'
+import data from '../cache'
 export default {
   name: 'homepage11',
   data () {
     return {
-      time: [1, 2, 3, 4, 5, 6, 7],
-      temperature: [120, 132, 101, 134, 90, 230, 210],
-      humidity: [320, 332, 301, 334, 390, 330, 320],
-      CO2concentration: [220, 182, 191, 234, 290, 330, 310],
-      light: [150, 232, 201, 154, 190, 330, 410],
-      ph: [820, 932, 901, 934, 1290, 1330, 1320],
-      nutrientConcentration: [999, 1020, 528, 287, 398, 873, 256],
+      pickerOptions: {
+        shortcuts: [{
+          text: '最近一周',
+          onClick (picker) {
+            const end = new Date()
+            const start = new Date()
+            start.setTime(start.getTime() - 3600 * 1000 * 24 * 7)
+            picker.$emit('pick', [start, end])
+          }
+        }, {
+          text: '最近一个月',
+          onClick (picker) {
+            const end = new Date()
+            const start = new Date()
+            start.setTime(start.getTime() - 3600 * 1000 * 24 * 30)
+            picker.$emit('pick', [start, end])
+          }
+        }, {
+          text: '最近三个月',
+          onClick (picker) {
+            const end = new Date()
+            const start = new Date()
+            start.setTime(start.getTime() - 3600 * 1000 * 24 * 90)
+            picker.$emit('pick', [start, end])
+          }
+        }]
+      },
+      dateTime: [],
+      time: [], // 时间
+      temperature: [], // 空气温度
+      humidity: [], // 空气湿度
+      CO2concentration: [], // 二氧化碳浓度
+      light: [], // 光照强度
+      ph: [], // ph值
+      nutrientConcentration: [], // 可溶盐浓度
       tableDataBegin: [],
       tableDataName: '',
       tableDataEnd: [],
@@ -107,19 +148,49 @@ export default {
     }
   },
   mounted () {
-    this.historyEcharts()
-    var testData = {
-      time: [1, 2, 3, 4, 5, 6, 7],
-      temperature: [120, 132, 101, 134, 90, 230, 210],
-      humidity: [320, 332, 301, 334, 390, 330, 320],
-      CO2concentration: [220, 182, 191, 234, 290, 330, 310],
-      light: [150, 232, 201, 154, 190, 330, 410],
-      ph: [820, 932, 901, 934, 1290, 1330, 1320],
-      nutrientConcentration: [999, 1020, 528, 287, 398, 873, 256]
-    }
-    this.openData(testData)
+    // this.openData(testData)
+    // 初始化设备历史数据
+    // let time = new Date().getTime()
+    let time = new Date().getTime()
+    let findHistory = new FormData()
+    findHistory.append('deviceID', sessionStorage.getItem('chooseDevice'))
+    findHistory.append('starttime', this.formatDate(time - 3600 * 10000))
+    findHistory.append('endtime', this.formatDate(time))
+    // console.log(this.formatDate(time - 3600 * 60000))
+    // console.log(this.formatDate(time))
+    this.getHistoryData(findHistory)
   },
   methods: {
+    // 历史数据请求接口
+    getHistoryData (findHistory) {
+      this.axios.post(data.serverSrc + '/dev/historydata', findHistory).then(body => {
+        // console.log(body)
+        for (let i = 0; i < body.data.length; i++) {
+          this.time.push(body.data[i].time)
+          this.temperature.push(body.data[i].temp)
+          this.humidity.push(body.data[i].rh)
+          this.CO2concentration.push(body.data[i].co2)
+          this.light.push(body.data[i].light)
+          this.ph.push(body.data[i].ph)
+          this.nutrientConcentration.push(body.data[i].ec)
+        }
+        // 显示折线图
+        this.historyEcharts()
+        // 显示分页
+        this.openData(body.data)
+      })
+    },
+    // 时间查找
+    searchFromTime () {
+      console.log(this.formatDate(this.dateTime[0]))
+      console.log(this.formatDate(this.dateTime[1]))
+      let findHistory = new FormData()
+      findHistory.append('deviceID', sessionStorage.getItem('chooseDevice'))
+      findHistory.append('starttime', this.formatDate(this.dateTime[0]))
+      findHistory.append('endtime', this.formatDate(this.dateTime[1]))
+      this.getHistoryData(findHistory)
+    },
+    // 折线图
     historyEcharts () {
       var myChart = echarts.init(document.getElementById('historyTable'))
       window.onresize = myChart.resize
@@ -152,6 +223,27 @@ export default {
         yAxis: {
           type: 'value'
         },
+        dataZoom: [
+          {
+            show: true,
+            start: 0,
+            end: 10
+          },
+          {
+            type: 'inside',
+            start: 0,
+            end: 10
+          },
+          {
+            show: true,
+            yAxisIndex: 0,
+            filterMode: 'empty',
+            width: 30,
+            height: '83%',
+            showDataShadow: false,
+            left: '96%'
+          }
+        ],
         series: [
           {
             name: '温度',
@@ -190,7 +282,7 @@ export default {
     // 分页初始化
     openData (val) {
       if (val) {
-        this.tableDataBegin = val.time
+        this.tableDataBegin = val
         this.totalItems = this.tableDataBegin.length
         if (this.totalItems > this.pageSize) {
           for (let index = 0; index < this.pageSize; index++) {
@@ -203,7 +295,6 @@ export default {
           this.filterTableDataEnd = this.tableDataBegin
           this.totalItems = this.tableDataBegin.length
         }
-        console.log('!!!!!!!!!!!', this.tableDataEnd)
       }
     },
     // 分页功能
@@ -232,6 +323,22 @@ export default {
           this.tableDataEnd.push(list[from])
         }
       }
+    },
+    // 时间戳转换
+    formatDate (value) {
+      let date = new Date(value)
+      let y = date.getFullYear()
+      let MM = date.getMonth() + 1
+      MM = MM < 10 ? ('0' + MM) : MM
+      let d = date.getDate()
+      d = d < 10 ? ('0' + d) : d
+      let h = date.getHours()
+      h = h < 10 ? ('0' + h) : h
+      let m = date.getMinutes()
+      m = m < 10 ? ('0' + m) : m
+      let s = date.getSeconds()
+      s = s < 10 ? ('0' + s) : s
+      return y + '-' + MM + '-' + d + ' ' + h + ':' + m + ':' + s
     }
   }
 }

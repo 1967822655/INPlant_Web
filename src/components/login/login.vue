@@ -23,7 +23,7 @@
           </div>
         </div>
         <div class="login-form" v-if="choose===2">
-          <p>用户注册</p>
+          <p class="title1">用户注册</p>
           <el-input class="login-item" v-model="registerEmail" placeholder="请输入邮箱账号" clearable prefix-icon="el-icon-user"></el-input>
           <div class="hintBox">
             <div @click="setInput(mail)" class="hintItem"  v-for="mail in emails" :key="mail">{{mail}}</div>
@@ -40,7 +40,7 @@
           </div>
         </div>
         <div class="login-form" v-if="choose===3">
-          <p>找回密码</p>
+          <p class="title1">找回密码</p>
           <el-input class="login-item" v-model="findEmail" placeholder="请输入用户邮箱" clearable prefix-icon="el-icon-user"></el-input>
           <div class="hintBox">
             <div @click="setInput(mail)" class="hintItem"  v-for="mail in emails" :key="mail">{{mail}}</div>
@@ -376,6 +376,13 @@ export default {
     letter-spacing: 0.2em;
     margin-top: 25px;
     margin-bottom: 35px;
+  }
+  .title1 {
+    text-align: center;
+    font-size: 20px;
+    letter-spacing: 0.2em;
+    margin-top: 10px;
+    margin-bottom: 10px;
   }
   .container .login-form .login-item{
     width: 90%;

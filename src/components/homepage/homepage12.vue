@@ -61,7 +61,6 @@ export default {
     // websocket初始化
     this.initWebSocket()
     this.realTimeEcharts()
-    // this.sendDevName(sessionStorage.getItem('chooseDevice'))
   },
   // 离开该层时执行
   destroyed: function () {
