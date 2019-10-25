@@ -78,8 +78,8 @@ export default {
       this.dialogForm.min = row.min
       this.dialogForm.max = row.max
       this.dialogForm.index = index
-//      console.log(row.thresholdMin === '-')
-//      console.log(row.thresholdMax === '-')
+      //  console.log(row.thresholdMin === '-')
+      //  console.log(row.thresholdMax === '-')
       if (row.thresholdMin === '-') {
         this.dialogForm.thresholdMin = row.min
       } else {
@@ -90,7 +90,7 @@ export default {
       } else {
         this.dialogForm.thresholdMax = row.thresholdMax
       }
-//      console.log(this.dialogForm)
+      //   console.log(this.dialogForm)
       this.dialogFormVisible = true
     },
     /**
@@ -118,8 +118,9 @@ export default {
       var upCtrl = new FormData()
       upCtrl.append('deviceID', sessionStorage.getItem('chooseDevice'))
       upCtrl.append('type', type)
-      if (this.dialogForm.thresholdMax !== undefined && this.dialogForm.thresholdMin !== undefined
-          && this.dialogForm.thresholdMax < this.dialogForm.thresholdMin) {
+      if (this.dialogForm.thresholdMax !== undefined &&
+        this.dialogForm.thresholdMin !== undefined &&
+        this.dialogForm.thresholdMax < this.dialogForm.thresholdMin) {
         this.thresholdInputError = '上限值应该大于下限值'
         return
       }
