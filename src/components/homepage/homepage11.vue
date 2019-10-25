@@ -164,7 +164,7 @@ export default {
     // 历史数据请求接口
     getHistoryData (findHistory) {
       this.axios.post(data.serverSrc + '/dev/historydata', findHistory).then(body => {
-        // console.log(body)
+        console.log(body)
         for (let i = 0; i < body.data.length; i++) {
           this.time.push(body.data[i].time)
           this.temperature.push(body.data[i].temp)
