@@ -16,7 +16,6 @@
             </div>
             <div>
               <input
-                placeholder="请输入内容"
                 type="number"
                 v-model="nutrientSet"
                 :disabled="nutrientNotEdit">
@@ -33,7 +32,6 @@
             </div>
             <div>
               <input
-                placeholder="请输入内容"
                 type="number"
                 v-model="lightSet"
                 :disabled="lightNotEdit">
@@ -50,7 +48,6 @@
             </div>
             <div>
               <input
-                placeholder="请输入内容"
                 type="number"
                 v-model="phSet"
                 :disabled="phNotEdit">
@@ -101,9 +98,15 @@
 import data from '../cache'
 export default {
   name: 'homepage2',
-  mounted () {
+  created () {
     // websocket初始化 -> load data of nutrient light fan
     this.initWebSocket()
+  },
+  // 离开该层时执行
+  beforeDestroy () {
+    // 离开路由之后断开websocket连接
+    console.log('离开homepage2')
+    this.websock.close()
   },
   data () {
     return {
@@ -116,7 +119,9 @@ export default {
       nutrientNotEdit: true,
       lightNotEdit: true,
       phNotEdit: true,
-      fullscreenLoading: false
+      fullscreenLoading: false,
+      editObjectName: '',
+      websock: undefined
     }
   },
   methods: {
@@ -141,27 +146,47 @@ export default {
     },
     // 数据接收
     websocketOnMessage (e) {
-      console.log(data.data)
+      //  console.log(e.data)
       if (e.data === 'false') {
         console.log('null')
       } else {
         let data = JSON.parse(e.data)
         console.log(data)
-        if (this.nutrientNotEdit) {
-          this.nutrientSet = data.ec
+        /**
+         * 修改状态中，开关类型参数等待10s内，再显示实时数据正常值
+         */
+        if (this.editObjectName !== '') {
+          console.log(this.editObjectName)
+          setTimeout(() => {
+            //  返回初始值
+            this.editObjectName = ''
+          }, 1000 * 10)
+        } else {
+          /**
+           * 未修改状态中如果数据没变化则不需要同步到view层
+           */
+          if (this.nutrientNotEdit && this.nutrientSet !== data.ec) {
+            this.nutrientSet = data.ec
+          }
+          if (this.phNotEdit && this.nutrientSet !== data.ph) {
+            this.phSet = data.ph
+          }
+          if (this.fanSetAndValue !== Boolean(data['fan'])) {
+            this.fanSetAndValue = Boolean(data['fan'])
+          }
+          if (this.ledSetAndValue !== Boolean(data['LED'])) {
+            this.ledSetAndValue = Boolean(data['LED'])
+          }
+          if (this.pumpSetAndValue !== Boolean(data['pump'])) {
+            this.pumpSetAndValue = Boolean(data['pump'])
+          }
         }
-        if (this.phNotEdit) {
-          this.phSet = data.ph
-        }
-        this.fanSetAndValue = Boolean(data['fan'])
-        this.ledSetAndValue = Boolean(data['LED'])
-        this.pumpSetAndValue = Boolean(data['pump'])
       }
     },
     // 数据发送
     websocketSend () {
-      this.websock.send('6af6188e14aa')
-      //  this.websock.send(sessionStorage.getItem('chooseDevice'))
+      // this.websock.send('6af6188e14aa')
+      this.websock.send(sessionStorage.getItem('chooseDevice'))
     },
     // 关闭
     websocketClose () {
@@ -174,25 +199,33 @@ export default {
     // 发送给服务器
     commitToServer (msg) {
       var upCtrl = new FormData()
-      //  upCtrl.append('username', localStorage.getItem('username'))
+      upCtrl.append('username', sessionStorage.getItem('username'))
       upCtrl.append('deviceID', sessionStorage.getItem('chooseDevice'))
       //  upCtrl.append('username', '1399472680@qq.com')
-      upCtrl.append('deviceID', '6af6188e14aa')
+      //  upCtrl.append('deviceID', '6af6188e14aa')
       upCtrl.append('msg', msg)
-      // 超时2min
-      this.axios.post(data.serverSrc + '/dev/downctrl', upCtrl, {timeout: 1000 * 6 * 2}).then(body => {
+      console.log(msg)
+      // 超时10s
+      this.axios.post(data.serverSrc + '/dev/downctrl', upCtrl, {timeout: 1000 * 10}).then(body => {
         console.log(body.data)
+        console.log(typeof body.data)
+        var infoMsg = '提交成功'
+        if (body.data === 'recvice error') {
+          infoMsg = '下行异常'
+        } else if (body.data === 'time out') {
+          infoMsg = '下行响应超时'
+        }
         this.fullscreenLoading = !this.fullscreenLoading
         this.$notify.info({
           title: '消息',
-          message: '提交成功'
+          message: infoMsg
         })
       }).catch(() => {
         console.log('出错')
         this.fullscreenLoading = !this.fullscreenLoading
         this.$notify.error({
           title: '消息',
-          message: '提交出错'
+          message: '操作失败'
         })
       })
     },
@@ -201,7 +234,7 @@ export default {
       this.nutrientNotEdit = !this.nutrientNotEdit
       this.fullscreenLoading = !this.fullscreenLoading
       console.log('commitNutrientToServer')
-      var newNutrient = parseInt(this.nutrientSet)
+      var newNutrient = parseFloat(this.nutrientSet)
       if (newNutrient >= 0 && newNutrient <= 4400) {
         console.log(newNutrient)
         var msg = JSON.stringify({
@@ -221,7 +254,8 @@ export default {
       this.lightNotEdit = !this.lightNotEdit
       this.fullscreenLoading = !this.fullscreenLoading
       console.log('commitNutrientToServer')
-      var newLight = parseInt(this.nutrientSet)
+      var newLight = parseFloat(this.lightSet)
+      console.log(newLight)
       if (newLight >= 0) {
         console.log(newLight)
         var msg = JSON.stringify({
@@ -241,7 +275,8 @@ export default {
       this.phNotEdit = !this.phNotEdit
       this.fullscreenLoading = !this.fullscreenLoading
       console.log('commitNutrientToServer')
-      var newPh = parseInt(this.nutrientSet)
+      var newPh = parseFloat(this.phSet)
+      console.log(newPh)
       if (newPh >= 0 && newPh <= 14) {
         console.log(newPh)
         var msg = JSON.stringify({
@@ -260,6 +295,7 @@ export default {
     // 开关类型
     commitFanToServer () {
       this.fullscreenLoading = !this.fullscreenLoading
+      this.editObjectName = 'fan'
       var msg = JSON.stringify({
         'fan': this.fanSetAndValue ? 1 : 0
       })
@@ -267,6 +303,7 @@ export default {
     },
     commitLedToServer () {
       this.fullscreenLoading = !this.fullscreenLoading
+      this.editObjectName = 'LED'
       var msg = JSON.stringify({
         'LED': this.ledSetAndValue ? 1 : 0
       })
@@ -274,6 +311,7 @@ export default {
     },
     commitPumpToServer () {
       this.fullscreenLoading = !this.fullscreenLoading
+      this.editObjectName = 'pump'
       var msg = JSON.stringify({
         'pump': this.pumpSetAndValue ? 1 : 0
       })

@@ -49,11 +49,11 @@
         </el-form-item>
         <el-form-item label="阈值上限" :label-width="formLabelWidth">
 <!--          或者用滑块slide-->
-          <el-input-number v-model="dialogForm.thresholdMax" :precision="2" :step="0.1"
+          <el-input-number v-model="dialogForm.thresholdMax" :precision="2" :step="0.1" style="width: 60%"
                            :max="dialogForm.max" :min="dialogForm.min"></el-input-number>
         </el-form-item>
         <el-form-item label="阈值下限" :label-width="formLabelWidth">
-          <el-input-number v-model="dialogForm.thresholdMin" :precision="2" :step="0.1"
+          <el-input-number v-model="dialogForm.thresholdMin" :precision="2" :step="0.1" style="width: 60%"
                            :max="dialogForm.max" :min="dialogForm.min"></el-input-number>
         </el-form-item>
         <span class="thresholdSetting-error" :label-width="formLabelWidth">{{thresholdInputError}}</span>
@@ -67,17 +67,19 @@
 </template>
 
 <script>
+import data from '../cache'
 export default {
   name: 'homepage3',
   methods: {
+    // 将表格中row行数据显示在dialog中
     edit (index, row) {
       this.dialogForm.valueName = row.valueName
       this.dialogForm.unitName = row.unitName
       this.dialogForm.min = row.min
       this.dialogForm.max = row.max
       this.dialogForm.index = index
-      console.log(row.thresholdMin === '-')
-      console.log(row.thresholdMax === '-')
+//      console.log(row.thresholdMin === '-')
+//      console.log(row.thresholdMax === '-')
       if (row.thresholdMin === '-') {
         this.dialogForm.thresholdMin = row.min
       } else {
@@ -88,79 +90,191 @@ export default {
       } else {
         this.dialogForm.thresholdMax = row.thresholdMax
       }
-      console.log(this.dialogForm)
+//      console.log(this.dialogForm)
       this.dialogFormVisible = true
     },
+    /**
+     *   dialog提交设置
+     *   1.成功 -> getThresholdFromServer
+     *   2.报错
+     * */
     update () {
       var i = this.dialogForm.index
-      if (this.dialogForm.thresholdMin) {
-        this.thresholdTableData[i].thresholdMin = this.dialogForm.thresholdMin
-      } else {
-        this.thresholdTableData[i].thresholdMin = '-'
+      var type = ''
+      switch (i) {
+        case 0: type = 'temp'
+          break
+        case 1: type = 'rh'
+          break
+        case 2: type = 'co2'
+          break
+        case 3: type = 'light'
+          break
+        case 4: type = 'ph'
+          break
+        case 5: type = 'ec'
+          break
       }
-      if (this.dialogForm.thresholdMax) {
-        this.thresholdTableData[i].thresholdMax = this.dialogForm.thresholdMax
-      } else {
-        this.thresholdTableData[i].thresholdMax = '-'
+      var upCtrl = new FormData()
+      upCtrl.append('deviceID', sessionStorage.getItem('chooseDevice'))
+      upCtrl.append('type', type)
+      if (this.dialogForm.thresholdMax !== undefined && this.dialogForm.thresholdMin !== undefined
+          && this.dialogForm.thresholdMax < this.dialogForm.thresholdMin) {
+        this.thresholdInputError = '上限值应该大于下限值'
+        return
       }
+      //  +防止空值处理
+      if (this.dialogForm.thresholdMax !== undefined) {
+        upCtrl.append('max', this.dialogForm.thresholdMax.toString())
+      } else {
+        upCtrl.append('max', 'null')
+        console.log('max: null')
+      }
+      if (this.dialogForm.thresholdMin !== undefined) {
+        upCtrl.append('min', this.dialogForm.thresholdMin.toString())
+      } else {
+        upCtrl.append('min', 'null')
+        console.log('min: null')
+      }
+      console.log(type)
+      console.log('max: ' + this.dialogForm.thresholdMax)
+      console.log('min: ' + this.dialogForm.thresholdMin)
       this.isUpLoading = true
-      setTimeout(() => {
+      this.axios.post(data.serverSrc + '/dev/changethreshold', upCtrl, {timeout: 1000 * 10}).then(body => {
+        console.log('返回值是：')
+        console.log(body.data)
+        this.isUpLoading = false
+        if (body.data === 'success') {
+          this.getThresholdFromServer()
+          this.dialogFormVisible = false
+        } else {
+          this.dialogFormVisible = false
+          this.$notify.info({
+            title: '消息',
+            message: '输入错误'
+          })
+        }
+      }).catch(() => {
         this.isUpLoading = false
         this.dialogFormVisible = false
-      }, 2000)
+        this.$notify.error({
+          title: '消息',
+          message: '上交超时'
+        })
+      })
+    },
+    //  在同步服务器数据之前初始化
+    beforeGetFromServer () {
+      this.thresholdTableData.forEach(item => {
+        item.thresholdMax = '-'
+        item.thresholdMin = '-'
+      })
+      this.isUpLoading = false
+      this.thresholdInputError = ''
+      this.loadingTableData = true
+    },
+    //  同步服务器数据
+    getThresholdFromServer () {
+      this.beforeGetFromServer()
+      var upCtrl = new FormData()
+      upCtrl.append('deviceID', sessionStorage.getItem('chooseDevice'))
+      this.axios.post(data.serverSrc + '/dev/getthreshold', upCtrl, {timeout: 1000 * 10}).then(body => {
+        console.log(body.data)
+        if (body.data['tempmax'] !== null) {
+          this.thresholdTableData[0].thresholdMax = body.data['tempmax']
+        }
+        if (body.data['tempmin'] !== null) {
+          this.thresholdTableData[0].thresholdMin = body.data['tempmin']
+        }
+        if (body.data['rhmax'] !== null) {
+          this.thresholdTableData[1].thresholdMax = body.data['rhmax']
+        }
+        if (body.data['rhmin'] !== null) {
+          this.thresholdTableData[1].thresholdMin = body.data['rhmin']
+        }
+        if (body.data['co2max'] !== null) {
+          this.thresholdTableData[2].thresholdMax = body.data['co2max']
+        }
+        if (body.data['co2min'] !== null) {
+          this.thresholdTableData[2].thresholdMin = body.data['co2min']
+        }
+        if (body.data['lightmax'] !== null) {
+          this.thresholdTableData[3].thresholdMax = body.data['lightmax']
+        }
+        if (body.data['lightmin'] !== null) {
+          this.thresholdTableData[3].thresholdMin = body.data['lightmin']
+        }
+        if (body.data['phmax'] !== null) {
+          this.thresholdTableData[4].thresholdMax = body.data['phmax']
+        }
+        if (body.data['phmin'] !== null) {
+          this.thresholdTableData[4].thresholdMin = body.data['phmin']
+        }
+        if (body.data['ecmax'] !== null) {
+          this.thresholdTableData[5].thresholdMax = body.data['ecmax']
+        }
+        if (body.data['ecmin'] !== null) {
+          this.thresholdTableData[5].thresholdMin = body.data['ecmin']
+        }
+        this.loadingTableData = false
+      }).catch(e => {
+        this.loadingTableData = false
+        this.$notify.error({
+          title: '消息',
+          message: '同步数据超时'
+        })
+      })
     }
   },
-  created () {
+  mounted () {
     console.log('加载数据到thresholdTableData中')
-    setTimeout(() => {
-      this.loadingTableData = false
-    }, 1000)
+    this.getThresholdFromServer()
   },
   data () {
     return {
       loadingTableData: true,
       thresholdTableData: [{
         valueName: '温度',
-        thresholdMin: '1',
-        thresholdMax: '2',
+        thresholdMin: '-',
+        thresholdMax: '-',
         unitName: '°C',
-        max: 2,
-        min: 1
+        max: 100000000,
+        min: -100000000
       }, {
         valueName: '湿度',
-        thresholdMin: '3',
+        thresholdMin: '-',
         thresholdMax: '-',
         unitName: '%',
-        max: 9,
-        min: 1
+        max: 100,
+        min: 0
       }, {
         valueName: 'CO2浓度',
         thresholdMin: '-',
-        thresholdMax: '4',
+        thresholdMax: '-',
         unitName: 'ppm',
-        max: 5,
-        min: 1
+        max: 100000000,
+        min: 0
       }, {
         valueName: '光照',
         thresholdMin: '-',
-        thresholdMax: '4',
+        thresholdMax: '-',
         unitName: 'lux',
-        max: 5,
-        min: 1
+        max: 100000000,
+        min: 0
       }, {
         valueName: '酸碱度',
         thresholdMin: '-',
-        thresholdMax: '5',
+        thresholdMax: '-',
         unitName: '-',
-        max: 8,
-        min: 1
+        max: 14,
+        min: 0
       }, {
         valueName: '营养液浓度',
-        thresholdMin: '6',
-        thresholdMax: '7',
+        thresholdMin: '-',
+        thresholdMax: '-',
         unitName: 'us/cm',
-        max: 10,
-        min: 1
+        max: 100000000,
+        min: 0
       }],
       dialogFormVisible: false,
       dialogForm: {
@@ -168,8 +282,8 @@ export default {
         thresholdMin: '',
         thresholdMax: '',
         unitName: '',
-        max: 2,
-        min: 1,
+        max: 0,
+        min: 0,
         index: -1
       },
       formLabelWidth: '100px',
