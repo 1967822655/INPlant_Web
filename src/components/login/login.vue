@@ -42,7 +42,7 @@
         <div class="login-form" v-if="choose===3">
           <p class="title1">找回密码</p>
           <el-input class="login-item" v-model="findEmail" placeholder="请输入用户邮箱" clearable prefix-icon="el-icon-user"></el-input>
-          <div class="hintBox">
+          <div class="hintBox" v-if="emails">
             <div @click="setInput(mail)" class="hintItem"  v-for="mail in emails" :key="mail">{{mail}}</div>
           </div>
           <div class="login-item" style="margin-left:5%">
@@ -148,6 +148,8 @@ export default {
       } else if (!this.inputPassword) {
         this.$message.error('密码不能为空')
       } else {
+        // !!!!!!!!!!!!!!!!!!!!!
+        // this.$router.push('/index')// 跳转主界面
         let registerParam = new FormData()
         registerParam.append('username', this.inputEmail)
         registerParam.append('password', this.inputPassword)
@@ -361,7 +363,7 @@ export default {
   }
   .container .login-form {
     width: 25%;
-    height: 330px;
+    height: 335px;
     position: absolute;
     top: 30%;
     left: 55%;
@@ -414,7 +416,7 @@ export default {
   .hintBox {
     width: 100%;
     max-height: 120px;
-    overflow-y:scroll;
+    /*overflow-y:scroll;*/
     overflow-x: auto;
     position: absolute;
     z-index: 999;
