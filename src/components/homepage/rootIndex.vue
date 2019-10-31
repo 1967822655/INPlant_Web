@@ -62,38 +62,8 @@
         <div class="rightBody">
           <div style="height: 20px;width: 150px;background-color: #fff;padding: 20px;border-radius: 20px;margin-left: 5px">{{ownGroup.groupID}}</div>
 <!--          设备表-->
-          <el-button style="margin-top: 10px;margin-left: 5px" type="primary" @click="dialogFormVisible = true;clearForm()">添加设备</el-button>
-          <table class="imageTable">
-            <tr>
-              <th>设备名</th>
-              <th>操作</th>
-            </tr>
-            <tr v-for="device in ownGroup.devices" :key="device">
-              <td>{{device}}</td>
-              <td><el-button type="danger" @click="deleteDevice(ownGroup.groupID, device)">删除设备</el-button></td>
-            </tr>
-            <tr v-if="!ownGroup.devices[0]">
-              <td colspan="2">暂无数据</td>
-            </tr>
-          </table>
-<!--          {{ownGroup.devices}}-->
-<!--          用户表-->
-          <el-button style="margin-left: 5px" type="primary"  @click="addUserWay()">添加用户</el-button>
-          <table class="imageTable">
-            <tr>
-              <th>用户名</th>
-              <th>操作</th>
-            </tr>
-            <tr v-for="user in ownGroup.users" :key="user">
-              <td>{{user}}</td>
-              <td><el-button type="danger"  @click="deleteUser(ownGroup.groupID, user)">删除用户</el-button></td>
-            </tr>
-            <tr v-if="!ownGroup.users[0]">
-              <td colspan="2">暂无数据</td>
-            </tr>
-          </table>
-<!--          {{ownGroup.users}}-->
-
+          <!--          添加设备-->
+          <el-button style="margin-top: 10px;margin-left: 5px" type="primary" @click="clearForm()">添加设备</el-button>
           <el-dialog title="添加设备" :visible.sync="dialogFormVisible">
             <el-form :model="form">
               <el-form-item label="设备ID" :label-width="formLabelWidth">
@@ -117,10 +87,40 @@
               </el-form-item>
             </el-form>
             <div slot="footer" class="dialog-footer">
-              <el-button @click="dialogFormVisible = false">取 消</el-button>
-              <el-button type="primary" @click="addDeviceWay();dialogFormVisible = false">确 定</el-button>
+              <el-button @click="cancelWay()">取 消</el-button>
+              <el-button type="primary" @click="addDeviceWay()">确 定</el-button>
             </div>
           </el-dialog>
+<!--          设备表-->
+          <table class="imageTable">
+            <tr>
+              <th>设备名</th>
+              <th>操作</th>
+            </tr>
+            <tr v-for="device in ownGroup.devices" :key="device">
+              <td>{{device}}</td>
+              <td><el-button type="danger" @click="deleteDevice(ownGroup.groupID, device)">删除设备</el-button></td>
+            </tr>
+            <tr v-if="!ownGroup.devices[0]">
+              <td colspan="2">暂无数据</td>
+            </tr>
+          </table>
+<!--          用户表-->
+          <el-button style="margin-left: 5px" type="primary"  @click="addUserWay()">添加用户</el-button>
+          <!--          用户表-->
+          <table class="imageTable">
+            <tr>
+              <th>用户名</th>
+              <th>操作</th>
+            </tr>
+            <tr v-for="user in ownGroup.users" :key="user">
+              <td>{{user}}</td>
+              <td><el-button type="danger"  @click="deleteUser(ownGroup.groupID, user)">删除用户</el-button></td>
+            </tr>
+            <tr v-if="!ownGroup.users[0]">
+              <td colspan="2">暂无数据</td>
+            </tr>
+          </table>
         </div>
       </div>
     </el-main>
@@ -337,6 +337,7 @@ export default {
           this.$message.error('请求失败')
         }
       })
+      this.dialogFormVisible = false
     },
     // 添加用户
     addUserWay () {
@@ -372,6 +373,11 @@ export default {
       this.form.kind = ''
       this.form.devicename = ''
       this.form.remarks = ''
+      this.dialogFormVisible = true
+    },
+    cancelWay () {
+      this.dialogFormVisible = false
+      this.$message.info('取消输入')
     }
   }
 }
