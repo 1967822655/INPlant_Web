@@ -261,17 +261,6 @@
           <!-- cont inner end -->
         </div>
       </div>
-<!--      实验台设备-->
-<!--      <div class="square" v-for="number in numbers" :key="number.name">-->
-<!--        <div style="font-size: 38px">-->
-<!--          种类：{{number.name}}-->
-<!--        </div>-->
-<!--        <div>实验台ID：{{number.deviceid}}</div>-->
-<!--        <div>培育天数：{{number.startday}}天</div>-->
-<!--        <div>描述：<textarea v-model="number.remarks"></textarea></div>-->
-<!--        <el-button type="success" @click="chooseDevice(number.deviceid)">进入实验室</el-button>-->
-<!--      </div>-->
-<!--      <div style="clear: both"></div>-->
     </el-main>
   </el-container>
 </template>

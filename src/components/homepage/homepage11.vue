@@ -160,7 +160,9 @@ export default {
     console.log(sessionStorage.getItem('chooseDevice'))
     console.log(this.formatDate(time - 3600 * 60000))
     console.log(this.formatDate(time))
-    this.getHistoryData(findHistory)
+    if (sessionStorage.getItem('username')) {
+      this.getHistoryData(findHistory)
+    }
   },
   methods: {
     // 历史数据请求接口
@@ -344,7 +346,7 @@ export default {
     }
   },
   destroyed () {
-    this.historyChart.clear()
+    // this.historyChart.clear()
   }
 }
 </script>

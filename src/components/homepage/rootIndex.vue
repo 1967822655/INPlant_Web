@@ -32,31 +32,96 @@
         </div>
         <span style="float:left;font-size: 40px;margin-left: 20px">实验室</span>
         <!--      添加模块-->
-        <el-button type="primary" @click="showAddDev = 1" style="float: right;margin: 6px 50px">添加实验台</el-button>
-        <!--添加设备模块-->
-        <div v-if="showAddDev" class="showAddDev">
-          <div style="font-size: 30px;float:right;margin-right: 10px;cursor: pointer" @click="showAddDev = 0">×</div>
-          <div style="">
-            <p>设备名: <input type="text" v-model="addDev.deviceName"></p>
-            <p>设备id: <input type="text" v-model="addDev.deviceID"></p>
-            <p>
-              种类:
-              <select name="addDevice" v-model="addDev.kind">
-                <option value="tomato">番茄</option>
-                <option value="lettuce">生菜</option>
-                <option value="celery">芹菜</option>
-                <option value="bitterMelon">苦瓜</option>
-                <option value="eggplant">茄子</option>
-                <option value="melon">甜瓜</option>
-              </select>
-            </p>
-            <p>设备备注: <input type="text" v-model="addDev.remarks"></p>
-            <el-button type="primary" @click="addDevice()">添加</el-button>
-          </div>
-        </div>
+        <el-button type="primary" @click="openAddGroup" style="float: right;margin: 6px 50px">添加新组</el-button>
       </div>
-      <div style="width:100%;height: 85%">
-        <div>{{numbers.data}}</div>
+      <div style="height: 85%;width: 100%;display: table">
+<!--        左分组-->
+        <div class="leftBody">
+          <template>
+            <el-table
+              :data="numbers"
+              height="100%"
+              border>
+              <el-table-column
+                prop="groupID"
+                label="实验组"
+                width="100">
+              </el-table-column>
+              <el-table-column
+                label="操作"
+                width="200">
+                <template slot-scope="scope">
+                  <el-button type="success" @click="showDetails(scope.row)">查看</el-button>
+                  <el-button type="danger" @click="deleteGroupWay(scope.row.groupID)">删除</el-button>
+                </template>
+              </el-table-column>
+            </el-table>
+          </template>
+        </div>
+<!--        右详情-->
+        <div class="rightBody">
+          <div style="height: 20px;width: 150px;background-color: #fff;padding: 20px;border-radius: 20px;margin-left: 5px">{{ownGroup.groupID}}</div>
+<!--          设备表-->
+          <el-button style="margin-top: 10px;margin-left: 5px" type="primary" @click="dialogFormVisible = true;clearForm()">添加设备</el-button>
+          <table class="imageTable">
+            <tr>
+              <th>设备名</th>
+              <th>操作</th>
+            </tr>
+            <tr v-for="device in ownGroup.devices" :key="device">
+              <td>{{device}}</td>
+              <td><el-button type="danger" @click="deleteDevice(ownGroup.groupID, device)">删除设备</el-button></td>
+            </tr>
+            <tr v-if="!ownGroup.devices[0]">
+              <td colspan="2">暂无数据</td>
+            </tr>
+          </table>
+<!--          {{ownGroup.devices}}-->
+<!--          用户表-->
+          <el-button style="margin-left: 5px" type="primary"  @click="addUserWay()">添加用户</el-button>
+          <table class="imageTable">
+            <tr>
+              <th>用户名</th>
+              <th>操作</th>
+            </tr>
+            <tr v-for="user in ownGroup.users" :key="user">
+              <td>{{user}}</td>
+              <td><el-button type="danger"  @click="deleteUser(ownGroup.groupID, user)">删除用户</el-button></td>
+            </tr>
+            <tr v-if="!ownGroup.users[0]">
+              <td colspan="2">暂无数据</td>
+            </tr>
+          </table>
+<!--          {{ownGroup.users}}-->
+
+          <el-dialog title="添加设备" :visible.sync="dialogFormVisible">
+            <el-form :model="form">
+              <el-form-item label="设备ID" :label-width="formLabelWidth">
+                <el-input v-model="form.deviceID" autocomplete="off"></el-input>
+              </el-form-item>
+              <el-form-item label="种类" :label-width="formLabelWidth">
+                <el-select v-model="form.kind" placeholder="请选择种类">
+                  <el-option label="番茄" value="tomato">番茄</el-option>
+                  <el-option label="生菜" value="lettuce">生菜</el-option>
+                  <el-option label="芹菜" value="celery">芹菜</el-option>
+                  <el-option label="苦瓜" value="bitterMelon">苦瓜</el-option>
+                  <el-option label="茄子" value="eggplant">茄子</el-option>
+                  <el-option label="甜瓜" value="melon">甜瓜</el-option>
+                </el-select>
+              </el-form-item>
+              <el-form-item label="设备名" :label-width="formLabelWidth">
+                <el-input v-model="form.devicename" autocomplete="off"></el-input>
+              </el-form-item>
+              <el-form-item label="描述" :label-width="formLabelWidth">
+                <el-input v-model="form.remarks" autocomplete="off"></el-input>
+              </el-form-item>
+            </el-form>
+            <div slot="footer" class="dialog-footer">
+              <el-button @click="dialogFormVisible = false">取 消</el-button>
+              <el-button type="primary" @click="addDeviceWay();dialogFormVisible = false">确 定</el-button>
+            </div>
+          </el-dialog>
+        </div>
       </div>
     </el-main>
   </el-container>
@@ -69,22 +134,22 @@ export default {
   data () {
     return {
       username: null,
-      numbers: {
-        data: null,
-        tomato: [],
-        lettuce: [],
-        celery: [],
-        bitterMelon: [],
-        eggplant: [],
-        melon: []
+      numbers: null,
+      // 左边详细显示
+      ownGroup: {
+        groupID: null,
+        devices: [],
+        users: []
       },
-      showAddDev: 0,
-      addDev: {
-        deviceID: null,
-        deviceName: null,
-        remarks: null,
-        kind: null
-      }
+      dialogTableVisible: false,
+      dialogFormVisible: false,
+      form: {
+        deviceID: '',
+        kind: '',
+        devicename: '',
+        remarks: ''
+      },
+      formLabelWidth: '120px'
     }
   },
   mounted () {
@@ -95,25 +160,7 @@ export default {
       this.$router.push('/')
     }
     console.log(sessionStorage.getItem('username'))
-    this.axios.get(data.serverSrc + '/root/showgroup').then(body => {
-      console.log(body)
-      // for (let i = 0; i < body.data.length; i++) {
-      //   if (body.data[i].kind === 'tomato') {
-      //     this.numbers.tomato.push(body.data[i])
-      //   } else if (body.data[i].kind === 'lettuce') {
-      //     this.numbers.lettuce.push(body.data[i])
-      //   } else if (body.data[i].kind === 'celery') {
-      //     this.numbers.celery.push(body.data[i])
-      //   } else if (body.data[i].kind === 'bitterMelon') {
-      //     this.numbers.bitterMelon.push(body.data[i])
-      //   } else if (body.data[i].kind === 'eggplant') {
-      //     this.numbers.eggplant.push(body.data[i])
-      //   } else if (body.data[i].kind === 'melon') {
-      //     this.numbers.melon.push(body.data[i])
-      //   }
-      // }
-      this.numbers.data = body.data
-    })
+    this.showGroup()
   },
   methods: {
     // 退出登录
@@ -130,30 +177,201 @@ export default {
     enterInterface () {
       this.$router.push('/INPlant_Web/homepage')
     },
-    // 添加设备
-    addDevice () {
-      if (this.addDev.deviceID && this.addDev.deviceName) {
-        let addDevice = new FormData()
-        addDevice.append('username', this.username)
-        addDevice.append('deviceID', this.addDev.deviceID)
-        addDevice.append('kind', this.addDev.kind)
-        addDevice.append('devicename', this.addDev.deviceName)
-        addDevice.append('remarks', this.addDev.remarks)
-        console.log(this.addDev)
-        this.axios.post(data.serverSrc + '/userdev/adddev', addDevice).then(body => {
+    // 展示组
+    showGroup () {
+      this.axios.get(data.serverSrc + '/root/showgroup').then(body => {
+        console.log(body)
+        this.numbers = body.data
+        this.showDetails(this.numbers[0])
+      })
+    },
+    // 添加组 弹出界面
+    openAddGroup () {
+      this.$prompt('请输入组名', '提示', {
+        confirmButtonText: '确定',
+        cancelButtonText: '取消'
+      }).then(({ value }) => {
+        this.addGroupWay(value)
+      }).catch(() => {
+        this.$message({
+          type: 'info',
+          message: '取消输入'
+        })
+      })
+    },
+    // 添加组
+    addGroupWay (val) {
+      if (val) {
+        let addGroup = new FormData()
+        addGroup.append('groupID', val)
+        this.axios.post(data.serverSrc + '/root/addgroup', addGroup).then(body => {
           if (body.data === 'success') {
-            this.$message.success('上传成功')
+            this.$message.success('添加成功')
+            this.showGroup()
           } else if (body.data === 'failed') {
             this.$message.error('添加失败')
           } else if (body.data === 'has') {
-            this.$message.error('用户已拥有设备')
-          } else if (body.data === 'device not exsit') {
-            this.$message.error('设备不存在')
+            this.$message.error('组已存在')
           } else {
-            this.$message.error('上传失败')
+            this.$message.error('请求失败')
           }
         })
       }
+    },
+    // 删除组
+    deleteGroupWay (val) {
+      if (val) {
+        let deleteGroup = new FormData()
+        deleteGroup.append('groupID', val)
+        this.axios.post(data.serverSrc + '/root/delgroup', deleteGroup).then(body => {
+          if (body.data === 'success') {
+            this.$message.success('删除成功')
+            this.showGroup()
+          } else if (body.data === 'failed') {
+            this.$message.error('添加失败')
+          } else if (body.data === 'no has') {
+            this.$message.error('组不存在')
+          } else if (body.data === 'userlist not null') {
+            this.$message.error('用户列表不为空，无法删除')
+          } else if (body.data === 'devlist not null') {
+            this.$message.error('设备列表不为空，无法删除')
+          } else {
+            this.$message.error('请求失败')
+          }
+        })
+      }
+    },
+    // 查看详细信息
+    showDetails (val) {
+      console.log(val)
+      this.ownGroup.groupID = null
+      this.ownGroup.devices = []
+      this.ownGroup.users = []
+      this.ownGroup.groupID = val.groupID
+      if (val.devices) {
+        this.ownGroup.devices = val.devices
+      } else {
+        this.ownGroup.devices = []
+      }
+      if (val.users) {
+        this.ownGroup.users = val.users
+      } else {
+        this.ownGroup.users = []
+      }
+    },
+    // 删除设备
+    deleteDevice () {
+      let temp = new FormData()
+      console.log(arguments)
+      temp.append('groupID', arguments[0])
+      temp.append('deviceID', arguments[1])
+      this.axios.post(data.serverSrc + '/root/deldevingroup', temp).then(body => {
+        if (body.data === 'success') {
+          this.$message.success('设备删除成功')
+          this.flashDetails()
+        } else if (body.data === 'failed') {
+          this.$message.error('设备删除失败')
+        } else if (body.data === 'not has') {
+          this.$message.error('设备不存在')
+        } else if (body.data === 'device not exsit') {
+          this.$message.error('设备不存在')
+        } else {
+          this.$message.error('请求失败')
+        }
+      })
+    },
+    // 删除用户
+    deleteUser (val) {
+      let temp = new FormData()
+      console.log(arguments)
+      temp.append('groupID', arguments[0])
+      temp.append('username', arguments[1])
+      this.axios.post(data.serverSrc + '/root/deluseringroup', temp).then(body => {
+        if (body.data === 'success') {
+          this.$message.success('用户删除成功')
+          this.flashDetails()
+        } else if (body.data === 'failed') {
+          this.$message.error('用户删除失败')
+        } else if (body.data === 'not has') {
+          this.$message.error('用户不存在')
+        } else {
+          this.$message.error('请求失败')
+        }
+      })
+    },
+    // 刷新详细信息
+    flashDetails () {
+      this.axios.get(data.serverSrc + '/root/showgroup').then(body => {
+        console.log(body)
+        this.numbers = body.data
+        for (let number in this.numbers) {
+          if (this.numbers[number].groupID === this.ownGroup.groupID) {
+            // 展示详细信息
+            this.showDetails(this.numbers[number])
+          }
+        }
+      })
+    },
+    // 添加设备
+    addDeviceWay () {
+      let temp = new FormData()
+      temp.append('groupID', this.ownGroup.groupID)
+      temp.append('deviceID', this.form.deviceID)
+      temp.append('kind', this.form.kind)
+      temp.append('devicename', this.form.devicename)
+      temp.append('remarks', this.form.remarks)
+      console.log(this.form)
+      this.axios.post(data.serverSrc + '/root/adddevingroup', temp).then(body => {
+        if (body.data === 'success') {
+          this.$message.success('设备添加成功')
+          this.flashDetails()
+        } else if (body.data === 'device not exsit') {
+          this.$message.error('设备不存在')
+        } else if (body.data === 'device is already in use') {
+          this.$message.error('设备已被使用')
+        } else if (body.data === 'failed') {
+          this.$message.error('设备添加失败')
+        } else if (body.data === 'has') {
+          this.$message.error('设备已存在')
+        } else {
+          this.$message.error('请求失败')
+        }
+      })
+    },
+    // 添加用户
+    addUserWay () {
+      this.$prompt('请输入用户名', '提示', {
+        confirmButtonText: '确定',
+        cancelButtonText: '取消'
+      }).then(({ value }) => {
+        let temp = new FormData()
+        temp.append('groupID', this.ownGroup.groupID)
+        temp.append('username', value)
+        this.axios.post(data.serverSrc + '/root/adduseringroup', temp).then(body => {
+          if (body.data === 'success') {
+            this.$message.success('用户添加成功')
+            this.flashDetails()
+          } else if (body.data === 'has') {
+            this.$message.error('用户已存在')
+          } else if (body.data === 'failed') {
+            this.$message.error('用户添加失败')
+          } else {
+            this.$message.error('请求失败')
+          }
+        })
+      }).catch(() => {
+        this.$message({
+          type: 'info',
+          message: '取消输入'
+        })
+      })
+    },
+    // clear
+    clearForm () {
+      this.form.deviceID = ''
+      this.form.kind = ''
+      this.form.devicename = ''
+      this.form.remarks = ''
     }
   }
 }
@@ -182,19 +400,7 @@ export default {
   body > .el-container {
     margin-bottom: 40px;
   }
-  /*.square {*/
-  /*  float: left;*/
-  /*  margin: 10px;*/
-  /*  padding: 10px;*/
-  /*  height: 150px;*/
-  /*  width: 300px;*/
-  /*  border-radius: 20px;*/
-  /*  background-color: rgba(255,255,255,0.7);*/
-  /*  !*box-shadow: 0 2px 4px rgba(0,0,0,12),0 0 6px rgba(0, 0, 0, .04);*!*/
-  /*  font-family: '楷体','宋体',Times, TimesNR, 'New Century Schoolbook',Georgia, 'New York', serif;*/
-  /*  font-size: 22px;*/
-  /*}*/
-  .showAddDev {
+  .addGroup {
     position: absolute;
     top: 61px;
     left: 50%;
@@ -208,5 +414,43 @@ export default {
     -moz-border-radius: 20px;
     border-radius: 20px;
     z-index: 99;
+  }
+  .leftBody {
+    width:300px;
+    height: 100%;
+    display: table-cell
+  }
+  .rightBody {
+    overflow: auto;
+    height: 100%;
+    display: table-cell;
+    overflow-x: hidden
+  }
+  table.imageTable {
+    font-family: verdana,arial,sans-serif;
+    font-size:11px;
+    color:#333333;
+    border-width: 1px;
+    border-color: #999999;
+    border-collapse: collapse;
+    width: 100%;
+    margin: 10px 5px 10px 5px;
+  }
+  table.imageTable th {
+    background: rgba(137, 137, 137, 0.2);
+    border-width: 1px;
+    padding: 8px;
+    border-style: solid;
+    border-color: #999999;
+    width: 50%;
+  }
+  table.imageTable td {
+    background:#ffffff;
+    border-width: 1px;
+    padding: 8px;
+    border-style: solid;
+    border-color: #999999;
+    width: 50%;
+    /*text-align: center;*/
   }
 </style>

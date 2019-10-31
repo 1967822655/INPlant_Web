@@ -5,7 +5,7 @@
         <h1>智慧种植系统平台</h1>
         <a href="https://free.modao.cc/app/3rkxnjr01k3k0q3oce5po8q31wvpda#screen=sk0q3ocs96afkwz6g" target="_blank">墨刀样式</a>
         <a href="https://docs.qq.com/sheet/DVWFNV0ZESllORG1j?tab=BB08J2&c=A1A0A0" target="_blank">接口文档</a>
-        <a href="http://192.168.100.93:8081/swagger-ui.html" target="_blank">接口文档(最新版)</a>
+        <a href="http://106.15.195.144:8081/swagger-ui.html#/" target="_blank">接口文档(最新版)</a>
       </div>
       <div class="login-picture">
         <div class="login-form" v-if="choose===1">
