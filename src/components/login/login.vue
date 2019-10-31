@@ -158,7 +158,11 @@ export default {
           if (body.data === 'success') {
             sessionStorage.setItem('username', this.inputEmail)// 存储本地用户名
             this.$message.success('登录成功')
-            this.$router.push('/index')// 跳转主界面
+            this.$router.push('/INPlant_Web/index')// 跳转主界面
+          } else if (body.data === 'root') {
+            sessionStorage.setItem('username', this.inputEmail)// 存储本地用户名
+            this.$message.success('登录成功')
+            this.$router.push('/INPlant_Web/rootIndex')
           } else if (body.data === 'not exist') {
             this.$message.error('用户名不存在')
             this.inputEmail = ''

@@ -301,7 +301,8 @@ export default {
     color: black;
     -webkit-text-fill-color: #7d7e80;
     -webkit-opacity: 1;
-    opacity: 1;  //默认的不透明级别为0.3
+    opacity: 1;
+    /*默认的不透明级别为0.3*/
     background-color: #fff;
   }
   .thresholdSetting-error {

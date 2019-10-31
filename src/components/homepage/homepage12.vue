@@ -48,7 +48,8 @@ export default {
       CO2concentration: [], // 二氧化碳浓度
       light: [], // 光照强度
       ph: [], // ph值
-      nutrientConcentration: [] // 可溶盐浓度
+      nutrientConcentration: [], // 可溶盐浓度
+      realtimeChart: null
     }
   },
   created () {
@@ -66,11 +67,12 @@ export default {
   destroyed: function () {
     // 离开路由之后断开websocket连接
     this.websock.close()
+    this.realtimeChart.clear()
   },
   methods: {
     // 初始化websocket
     initWebSocket () {
-      const path = 'ws://192.168.100.93:8081/webSocket'
+      const path = 'ws://106.15.195.144:8081/webSocket'
       this.websock = new WebSocket(path)
       this.websock.onmessage = this.websocketOnMessage
       this.websock.onopen = this.websocketOnOpen
@@ -127,8 +129,8 @@ export default {
       this.websocketSend(chooseDevice)
     },
     realTimeEcharts () {
-      var myChart = echarts.init(document.getElementById('realTimeTable'))
-      window.onresize = myChart.resize
+      this.realtimeChart = echarts.init(document.getElementById('realTimeTable'))
+      window.onresize = this.realtimeChart.resize
       var option = {
         title: {
           text: '折线图堆叠'
@@ -191,7 +193,7 @@ export default {
           }
         ]
       }
-      myChart.setOption(option)
+      this.realtimeChart.setOption(option)
     }
   }
 }

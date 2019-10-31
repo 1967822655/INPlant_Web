@@ -14,84 +14,84 @@
     </el-date-picker>
     <el-button type="primary buttonSize" @click="searchFromTime()">确定</el-button>
     <div id="historyTable" style="height: 600px; width: 100%"></div>
-    <el-table
-      :data="tableDataEnd"
-      stripe>
-      <el-table-column
-        prop="name"
-        label="时间"
-        min-width="100"
-        height="150">
-        <template slot-scope="scope">
-          <span size="small">{{scope.row.time}}</span>
-        </template>
-      </el-table-column>
-      <el-table-column
-        prop="name"
-        label="温度"
-        min-width="100"
-        height="150">
-        <template slot-scope="scope">
-          <span size="small">{{scope.row.temp}}℃</span>
-        </template>
-      </el-table-column>
-      <el-table-column
-        prop="name"
-        label="湿度"
-        min-width="100"
-        height="150">
-        <template slot-scope="scope">
-          <span size="small">{{scope.row.rh}}%</span>
-        </template>
-      </el-table-column>
-      <el-table-column
-        prop="name"
-        label="CO2浓度"
-        min-width="100"
-        height="150">
-        <template slot-scope="scope">
-          <span size="small">{{scope.row.co2}}PPM</span>
-        </template>
-      </el-table-column>
-      <el-table-column
-        prop="name"
-        label="光照"
-        min-width="100"
-        height="150">
-        <template slot-scope="scope">
-          <span size="small">{{scope.row.light}}LUX</span>
-        </template>
-      </el-table-column>
-      <el-table-column
-        prop="name"
-        label="酸碱度"
-        min-width="100"
-        height="150">
-        <template slot-scope="scope">
-          <span size="small">{{scope.row.ph}}</span>
-        </template>
-      </el-table-column>
-      <el-table-column
-        prop="name"
-        label="营养液浓度"
-        min-width="100"
-        height="150">
-        <template slot-scope="scope">
-          <span size="small">{{scope.row.ec}}mS/cm</span>
-        </template>
-      </el-table-column>
-    </el-table>
-    <div style="text-align: center; margin-top: 10px;">
-      <el-pagination
-        @size-change="handleSizeChange"
-        @current-change="handleCurrentChange"
-        :current-page="currentPage"
-        :page-sizes="[8, 12, 16, 20, 30]"
-        :page-size="pageSize"
-        layout="total, sizes, prev, pager, next, jumper"
-        :total="totalItems">
-      </el-pagination>
-    </div>
+<!--    <el-table-->
+<!--      :data="tableDataEnd"-->
+<!--      stripe>-->
+<!--      <el-table-column-->
+<!--        prop="name"-->
+<!--        label="时间"-->
+<!--        min-width="100"-->
+<!--        height="150">-->
+<!--        <template slot-scope="scope">-->
+<!--          <span size="small">{{scope.row.time}}</span>-->
+<!--        </template>-->
+<!--      </el-table-column>-->
+<!--      <el-table-column-->
+<!--        prop="name"-->
+<!--        label="温度"-->
+<!--        min-width="100"-->
+<!--        height="150">-->
+<!--        <template slot-scope="scope">-->
+<!--          <span size="small">{{scope.row.temp}}℃</span>-->
+<!--        </template>-->
+<!--      </el-table-column>-->
+<!--      <el-table-column-->
+<!--        prop="name"-->
+<!--        label="湿度"-->
+<!--        min-width="100"-->
+<!--        height="150">-->
+<!--        <template slot-scope="scope">-->
+<!--          <span size="small">{{scope.row.rh}}%</span>-->
+<!--        </template>-->
+<!--      </el-table-column>-->
+<!--      <el-table-column-->
+<!--        prop="name"-->
+<!--        label="CO2浓度"-->
+<!--        min-width="100"-->
+<!--        height="150">-->
+<!--        <template slot-scope="scope">-->
+<!--          <span size="small">{{scope.row.co2}}PPM</span>-->
+<!--        </template>-->
+<!--      </el-table-column>-->
+<!--      <el-table-column-->
+<!--        prop="name"-->
+<!--        label="光照"-->
+<!--        min-width="100"-->
+<!--        height="150">-->
+<!--        <template slot-scope="scope">-->
+<!--          <span size="small">{{scope.row.light}}LUX</span>-->
+<!--        </template>-->
+<!--      </el-table-column>-->
+<!--      <el-table-column-->
+<!--        prop="name"-->
+<!--        label="酸碱度"-->
+<!--        min-width="100"-->
+<!--        height="150">-->
+<!--        <template slot-scope="scope">-->
+<!--          <span size="small">{{scope.row.ph}}</span>-->
+<!--        </template>-->
+<!--      </el-table-column>-->
+<!--      <el-table-column-->
+<!--        prop="name"-->
+<!--        label="营养液浓度"-->
+<!--        min-width="100"-->
+<!--        height="150">-->
+<!--        <template slot-scope="scope">-->
+<!--          <span size="small">{{scope.row.ec}}mS/cm</span>-->
+<!--        </template>-->
+<!--      </el-table-column>-->
+<!--    </el-table>-->
+<!--    <div style="text-align: center; margin-top: 10px;">-->
+<!--      <el-pagination-->
+<!--        @size-change="handleSizeChange"-->
+<!--        @current-change="handleCurrentChange"-->
+<!--        :current-page="currentPage"-->
+<!--        :page-sizes="[8, 12, 16, 20, 30]"-->
+<!--        :page-size="pageSize"-->
+<!--        layout="total, sizes, prev, pager, next, jumper"-->
+<!--        :total="totalItems">-->
+<!--      </el-pagination>-->
+<!--    </div>-->
   </div>
 </template>
 
@@ -144,7 +144,8 @@ export default {
       pageSize: 8,
       totalItems: 8,
       filterTableDataEnd: [],
-      flag: true
+      flag: true,
+      historyChart: null
     }
   },
   mounted () {
@@ -154,10 +155,11 @@ export default {
     let time = new Date().getTime()
     let findHistory = new FormData()
     findHistory.append('deviceID', sessionStorage.getItem('chooseDevice'))
-    findHistory.append('starttime', this.formatDate(time - 3600 * 10000))
+    findHistory.append('starttime', this.formatDate(time - 3600 * 100000))
     findHistory.append('endtime', this.formatDate(time))
-    // console.log(this.formatDate(time - 3600 * 60000))
-    // console.log(this.formatDate(time))
+    console.log(sessionStorage.getItem('chooseDevice'))
+    console.log(this.formatDate(time - 3600 * 60000))
+    console.log(this.formatDate(time))
     this.getHistoryData(findHistory)
   },
   methods: {
@@ -192,8 +194,8 @@ export default {
     },
     // 折线图
     historyEcharts () {
-      var myChart = echarts.init(document.getElementById('historyTable'))
-      window.onresize = myChart.resize
+      this.historyChart = echarts.init(document.getElementById('historyTable'))
+      window.onresize = this.historyChart.resize
       var option = {
         title: {
           text: '折线图堆叠'
@@ -277,7 +279,7 @@ export default {
           }
         ]
       }
-      myChart.setOption(option)
+      this.historyChart.setOption(option)
     },
     // 分页初始化
     openData (val) {
@@ -340,6 +342,9 @@ export default {
       s = s < 10 ? ('0' + s) : s
       return y + '-' + MM + '-' + d + ' ' + h + ':' + m + ':' + s
     }
+  },
+  destroyed () {
+    this.historyChart.clear()
   }
 }
 </script>

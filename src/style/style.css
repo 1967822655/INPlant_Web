@@ -173,11 +173,11 @@
   -webkit-transition: all 0.5s 1.4s;
   transition: all 0.5s 1.4s;
 }
-.el__text {
-  text-transform: uppercase;
-  font-size: 40px;
-  color: #fff;
-}
+/*.el__text {*/
+/*  text-transform: uppercase;*/
+/*  font-size: 40px;*/
+/*  color: #fff;*/
+/*}*/
 .el__close-btn {
   z-index: -1;
   position: absolute;

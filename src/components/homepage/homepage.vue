@@ -16,7 +16,7 @@
             你好！
           </template>
 <!--          <el-menu-item index="2-1">个人信息</el-menu-item>-->
-          <el-menu-item>退出登录</el-menu-item>
+          <el-menu-item @click="backLogin()">退出登录</el-menu-item>
         </el-submenu>
       </el-menu>
     </el-header>
@@ -75,6 +75,14 @@ export default {
       showPage: 'homepage11'
     }
   },
+  mounted () {
+    // 拦截
+    this.username = sessionStorage.getItem('username')
+    if (!this.username) {
+      this.$message.error('未登录账号')
+      this.$router.push('/')
+    }
+  },
   components: {
     homepage11,
     homepage12,
@@ -84,6 +92,11 @@ export default {
     homepage42
   },
   methods: {
+    // 退出登录
+    backLogin () {
+      sessionStorage.removeItem('username')
+      this.$router.push('/')
+    },
     handleSelect (key, keyPath) {
       switch (key.index) {
         case '1-1':

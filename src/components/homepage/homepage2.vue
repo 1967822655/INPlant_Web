@@ -127,7 +127,7 @@ export default {
   methods: {
     // 初始化websocket
     initWebSocket () {
-      const path = 'ws://192.168.100.93:8081/webSocket'
+      const path = 'ws://106.15.195.144:8081/webSocket'
       this.websock = new WebSocket(path)
       this.websock.onmessage = this.websocketOnMessage
       this.websock.onopen = this.websocketOnOpen
