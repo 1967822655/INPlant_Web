@@ -1,33 +1,42 @@
 <template>
-  <div style="width: 100%">
-    <div>实时数据</div>
+  <div class="module">
+    <div class="module-title">
+      <p>实时数据</p>
+    </div>
+    <el-divider></el-divider>
     <div class="dataBox">
       <div class="row">
         <div class="col">
           <p class="word">空气温度：</p>
-          <div class="data">{{this.temperature[this.temperature.length-1]}}℃</div>
+          <div class="data" v-if="this.temperature[this.temperature.length-1]">{{this.temperature[this.temperature.length-1]}}℃</div>
+          <div class="data" v-if="!this.temperature[this.temperature.length-1]">NULL</div>
         </div>
         <div class="col">
           <p class="word">空气湿度：</p>
-          <div class="data">{{this.humidity[this.humidity.length-1]}}%</div>
+          <div class="data"  v-if="this.humidity[this.humidity.length-1]">{{this.humidity[this.humidity.length-1]}}%</div>
+          <div class="data" v-if="!this.humidity[this.humidity.length-1]">NULL</div>
         </div>
         <div class="col">
           <p class="word">光照强度：</p>
-          <div class="data">{{this.light[this.light.length-1]}}LUX</div>
+          <div class="data" v-if="this.light[this.light.length-1]">{{this.light[this.light.length-1]}}LUX</div>
+          <div class="data" v-if="!this.light[this.light.length-1]">NULL</div>
         </div>
       </div>
       <div class="row">
         <div class="col">
           <p class="word">可溶盐浓度：</p>
-          <div class="data">{{this.nutrientConcentration[this.nutrientConcentration.length-1]}}mS/cm</div>
+          <div class="data" v-if="this.nutrientConcentration[this.nutrientConcentration.length-1]">{{this.nutrientConcentration[this.nutrientConcentration.length-1]}}mS/cm</div>
+          <div class="data" v-if="!this.nutrientConcentration[this.nutrientConcentration.length-1]">NULL</div>
         </div>
         <div class="col">
           <p class="word">ph值：</p>
-          <div class="data">{{this.ph[this.ph.length-1]}}</div>
+          <div class="data" v-if="this.ph[this.ph.length-1]">{{this.ph[this.ph.length-1]}}</div>
+          <div class="data" v-if="!this.ph[this.ph.length-1]">NULL</div>
         </div>
         <div class="col">
           <p class="word">二氧化碳浓度：</p>
-          <div class="data">{{this.CO2concentration[this.CO2concentration.length-1]}}PPM</div>
+          <div class="data" v-if="this.CO2concentration[this.CO2concentration.length-1]">{{this.CO2concentration[this.CO2concentration.length-1]}}PPM</div>
+          <div class="data" v-if="!this.CO2concentration[this.CO2concentration.length-1]">NULL</div>
         </div>
       </div>
     </div>
@@ -93,14 +102,15 @@ export default {
     },
     // 数据接收
     websocketOnMessage (e) {
-      console.log(e.data)
       let data = JSON.parse(e.data)
+      console.log(data)
       this.time.push(new Date().toString().split('GMT')[0])
       this.temperature.push(data.temperature)
       this.humidity.push(data.humidity)
       this.CO2concentration.push(data.co2)
       this.light.push(data.light_intensity)
       this.ph.push(data.ph)
+      this.nutrientConcentration.push(data.ec)
       if (this.time.length > 20) {
         this.time.splice(0, 1)
         this.temperature.splice(0, 1)
@@ -108,8 +118,9 @@ export default {
         this.CO2concentration.splice(0, 1)
         this.light.splice(0, 1)
         this.ph.splice(0, 1)
+        this.nutrientConcentration.splice(0, 1)
+        console.log(this.ph)
       }
-      this.nutrientConcentration.push(data.ec)
       this.realTimeEcharts()
     },
     // 数据发送
@@ -125,7 +136,7 @@ export default {
       // let actions = {'devName': devName}
       // console.log(actions)
       // this.websocketSend(JSON.stringify(actions))
-      console.log(chooseDevice)
+      // console.log(chooseDevice)
       this.websocketSend(chooseDevice)
     },
     realTimeEcharts () {
@@ -200,6 +211,7 @@ export default {
 </script>
 
 <style scoped>
+  @import "../../style/module.css";
   .dataBox {
     height: 300px;
     width: 100%;
@@ -211,6 +223,7 @@ export default {
     width: 100%;
   }
   .col {
+    min-width: 300px;
     width: 33.33%;
   }
   .word {

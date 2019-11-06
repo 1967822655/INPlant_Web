@@ -16,6 +16,7 @@
             你好！
           </template>
 <!--          <el-menu-item index="2-1">个人信息</el-menu-item>-->
+          <el-menu-item @click="backChoose()">选择设备</el-menu-item>
           <el-menu-item @click="backLogin()">退出登录</el-menu-item>
         </el-submenu>
       </el-menu>
@@ -96,6 +97,9 @@ export default {
     backLogin () {
       sessionStorage.removeItem('username')
       this.$router.push('/')
+    },
+    backChoose () {
+      this.$router.push('/INPlant_Web/index')
     },
     handleSelect (key, keyPath) {
       switch (key.index) {

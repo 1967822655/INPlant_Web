@@ -1,6 +1,9 @@
 <template>
-  <div style="width: 100%">
-    <p>历史数据</p>
+  <div class="module">
+    <div class="module-title">
+      <p>历史数据</p>
+    </div>
+    <el-divider></el-divider>
     <span class="demonstration">查看的时间：</span>
     <el-date-picker
       v-model="dateTime"
@@ -155,11 +158,11 @@ export default {
     let time = new Date().getTime()
     let findHistory = new FormData()
     findHistory.append('deviceID', sessionStorage.getItem('chooseDevice'))
-    findHistory.append('starttime', this.formatDate(time - 3600 * 100000))
+    findHistory.append('starttime', this.formatDate(time - 3600 * 8000 - 3600 * 4000))
     findHistory.append('endtime', this.formatDate(time))
-    console.log(sessionStorage.getItem('chooseDevice'))
-    console.log(this.formatDate(time - 3600 * 60000))
-    console.log(this.formatDate(time))
+    // console.log(sessionStorage.getItem('chooseDevice'))
+    // console.log(this.formatDate(time - 3600 * 8000))
+    // console.log(this.formatDate(time))
     if (sessionStorage.getItem('username')) {
       this.getHistoryData(findHistory)
     }
@@ -168,8 +171,15 @@ export default {
     // 历史数据请求接口
     getHistoryData (findHistory) {
       this.axios.post(data.serverSrc + '/dev/historydata', findHistory).then(body => {
-        console.log(body)
+        // console.log(body)
+        this.time = []
+        this.temperature = []
+        this.humidity = []
+        this.CO2concentration = []
+        this.light = []
+        this.ph = []
         for (let i = 0; i < body.data.length; i++) {
+          this.nutrientConcentration = []
           this.time.push(body.data[i].time)
           this.temperature.push(body.data[i].temp)
           this.humidity.push(body.data[i].rh)
@@ -186,8 +196,8 @@ export default {
     },
     // 时间查找
     searchFromTime () {
-      console.log(this.formatDate(this.dateTime[0]))
-      console.log(this.formatDate(this.dateTime[1]))
+      // console.log(this.formatDate(this.dateTime[0]))
+      // console.log(this.formatDate(this.dateTime[1]))
       let findHistory = new FormData()
       findHistory.append('deviceID', sessionStorage.getItem('chooseDevice'))
       findHistory.append('starttime', this.formatDate(this.dateTime[0]))
@@ -352,5 +362,5 @@ export default {
 </script>
 
 <style scoped>
-
+  @import "../../style/module.css";
 </style>

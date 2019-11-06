@@ -20,7 +20,7 @@
       </el-menu>
     </el-header>
     <!--    主界面-->
-    <el-main style="width:100%;height: 100%">
+    <el-main style="width:100%;height: 100%;overflow-y: auto;">
       <div style="height: 50px;width: 100%;padding: 15px">
         <div style="float:left;top: 10px;" class="loader">
           <div class="face">
@@ -33,8 +33,9 @@
         <span style="float:left;font-size: 40px;margin-left: 20px">实验室</span>
         <!--      添加模块-->
         <el-button type="primary" @click="openAddGroup" style="float: right;margin: 6px 50px">添加新组</el-button>
+        <el-button type="primary" @click="openAddDevice" style="float: right;margin: 6px 5px">新设备入库</el-button>
       </div>
-      <div style="height: 85%;width: 100%;display: table">
+      <div style="height: 85%;width: 100%;display: table;overflow-y: auto;">
 <!--        左分组-->
         <div class="leftBody">
           <template>
@@ -60,7 +61,7 @@
         </div>
 <!--        右详情-->
         <div class="rightBody">
-          <div style="height: 20px;width: 150px;background-color: #fff;padding: 20px;border-radius: 20px;margin-left: 5px">{{ownGroup.groupID}}</div>
+          <div class="titleCss">{{ownGroup.groupID}}</div>
 <!--          设备表-->
           <!--          添加设备-->
           <el-button style="margin-top: 10px;margin-left: 5px" type="primary" @click="clearForm()">添加设备</el-button>
@@ -192,6 +193,39 @@ export default {
         cancelButtonText: '取消'
       }).then(({ value }) => {
         this.addGroupWay(value)
+      }).catch(() => {
+        this.$message({
+          type: 'info',
+          message: '取消输入'
+        })
+      })
+    },
+    // 添加设备入库
+    openAddDevice () {
+      this.$prompt('请输入新设备', '提示', {
+        confirmButtonText: '确定',
+        cancelButtonText: '取消'
+      }).then(({ value }) => {
+        let temp = new FormData()
+        temp.append('deviceID', value)
+        this.axios.post(data.serverSrc + '/root/newdevtest', temp).then(body => {
+          if (body.data === 'valid') {
+            this.$message.success('设备连接有效')
+            this.axios.post(data.serverSrc + '/root/adddev', temp).then(body => {
+              if (body.data === 'success') {
+                this.$message.success('设备入库成功')
+              } else if (body.data === 'has') {
+                this.$message.error('设备已入库')
+              }
+            })
+          } else if (body.data === 'invalid') {
+            this.$message.error('设备连接无效')
+          } else if (body.data === 'has') {
+            this.$message.error('设备已存在')
+          } else {
+            this.$message.error('请求失败')
+          }
+        })
       }).catch(() => {
         this.$message({
           type: 'info',
@@ -430,7 +464,8 @@ export default {
     overflow: auto;
     height: 100%;
     display: table-cell;
-    overflow-x: hidden
+    overflow-x: hidden;
+    overflow-y: auto;
   }
   table.imageTable {
     font-family: verdana,arial,sans-serif;
@@ -458,5 +493,12 @@ export default {
     border-color: #999999;
     width: 50%;
     /*text-align: center;*/
+  }
+  .titleCss {
+    background-color: #fff;
+    border-radius: 20px;
+    margin-left: 5px;
+    padding-left: 5px;
+    font-size: 24px;
   }
 </style>

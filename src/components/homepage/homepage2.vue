@@ -146,17 +146,17 @@ export default {
     },
     // 数据接收
     websocketOnMessage (e) {
-      //  console.log(e.data)
+      console.log(e.data)
       if (e.data === 'false') {
         console.log('null')
       } else {
         let data = JSON.parse(e.data)
-        console.log(data)
+        // console.log(data)
         /**
          * 修改状态中，开关类型参数等待10s内，再显示实时数据正常值
          */
         if (this.editObjectName !== '') {
-          console.log(this.editObjectName)
+          // console.log(this.editObjectName)
           setTimeout(() => {
             //  返回初始值
             this.editObjectName = ''

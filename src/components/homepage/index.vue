@@ -31,29 +31,6 @@
           </div>
         </div>
         <span style="float:left;font-size: 40px;margin-left: 20px">实验室</span>
-        <!--      添加模块-->
-        <el-button type="primary" @click="showAddDev = 1" style="float: right;margin: 6px 50px">添加实验台</el-button>
-        <!--添加设备模块-->
-        <div v-if="showAddDev" class="showAddDev">
-          <div style="font-size: 30px;float:right;margin-right: 10px;cursor: pointer" @click="showAddDev = 0">×</div>
-          <div style="">
-            <p>设备名: <input type="text" v-model="addDev.deviceName"></p>
-            <p>设备id: <input type="text" v-model="addDev.deviceID"></p>
-            <p>
-              种类:
-              <select name="addDevice" v-model="addDev.kind">
-                <option value="tomato">番茄</option>
-                <option value="lettuce">生菜</option>
-                <option value="celery">芹菜</option>
-                <option value="bitterMelon">苦瓜</option>
-                <option value="eggplant">茄子</option>
-                <option value="melon">甜瓜</option>
-              </select>
-            </p>
-            <p>设备备注: <input type="text" v-model="addDev.remarks"></p>
-            <el-button type="primary" @click="addDevice()">添加</el-button>
-          </div>
-        </div>
       </div>
       <div style="width:100%;height: 85%">
         <div class="cont">
@@ -356,32 +333,32 @@ export default {
     // 跳转单个实验台详细界面
     enterInterface () {
       this.$router.push('/INPlant_Web/homepage')
-    },
-    // 添加设备
-    addDevice () {
-      if (this.addDev.deviceID && this.addDev.deviceName) {
-        let addDevice = new FormData()
-        addDevice.append('username', this.username)
-        addDevice.append('deviceID', this.addDev.deviceID)
-        addDevice.append('kind', this.addDev.kind)
-        addDevice.append('devicename', this.addDev.deviceName)
-        addDevice.append('remarks', this.addDev.remarks)
-        console.log(this.addDev)
-        this.axios.post(data.serverSrc + '/userdev/adddev', addDevice).then(body => {
-          if (body.data === 'success') {
-            this.$message.success('上传成功')
-          } else if (body.data === 'failed') {
-            this.$message.error('添加失败')
-          } else if (body.data === 'has') {
-            this.$message.error('用户已拥有设备')
-          } else if (body.data === 'device not exsit') {
-            this.$message.error('设备不存在')
-          } else {
-            this.$message.error('上传失败')
-          }
-        })
-      }
     }
+    // // 添加设备
+    // addDevice () {
+    //   if (this.addDev.deviceID && this.addDev.deviceName) {
+    //     let addDevice = new FormData()
+    //     addDevice.append('username', this.username)
+    //     addDevice.append('deviceID', this.addDev.deviceID)
+    //     addDevice.append('kind', this.addDev.kind)
+    //     addDevice.append('devicename', this.addDev.deviceName)
+    //     addDevice.append('remarks', this.addDev.remarks)
+    //     console.log(this.addDev)
+    //     this.axios.post(data.serverSrc + '/userdev/adddev', addDevice).then(body => {
+    //       if (body.data === 'success') {
+    //         this.$message.success('上传成功')
+    //       } else if (body.data === 'failed') {
+    //         this.$message.error('添加失败')
+    //       } else if (body.data === 'has') {
+    //         this.$message.error('用户已拥有设备')
+    //       } else if (body.data === 'device not exsit') {
+    //         this.$message.error('设备不存在')
+    //       } else {
+    //         this.$message.error('上传失败')
+    //       }
+    //     })
+    //   }
+    // }
   }
 }
 </script>

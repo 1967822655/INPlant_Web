@@ -8,6 +8,7 @@
         <a href="http://106.15.195.144:8081/swagger-ui.html#/" target="_blank">接口文档(最新版)</a>
       </div>
       <div class="login-picture">
+        <!--用户登录-->
         <div class="login-form" v-if="choose===1">
           <p class="title">用户登录</p>
           <p class="login-item error">{{inputError}}</p>
@@ -22,6 +23,7 @@
             <el-link class="right" type="primary" :underline="false" @click="chooseInterface(3)">忘记密码?</el-link>
           </div>
         </div>
+        <!--用户注册-->
         <div class="login-form" v-if="choose===2">
           <p class="title1">用户注册</p>
           <el-input class="login-item" v-model="registerEmail" placeholder="请输入邮箱账号" clearable prefix-icon="el-icon-user"></el-input>
@@ -30,7 +32,7 @@
           </div>
           <div class="login-item" style="margin-left:5%">
             <el-input style="width: 50%;margin: 5px 0px 5px 0px;float: left;" v-model="registerCode" placeholder="请输入验证码"></el-input>
-            <el-button style="letter-spacing: 0.1em;margin: 5px 0px 5px 0px;width: 40%;float: right;" type="primary" @click="registerSendCode">发送验证</el-button>
+            <el-button style="letter-spacing: 0.1em;margin: 5px 0px 5px 0px;width: 40%;float: right;" type="primary" @click="registerSendCode">{{code30s}}</el-button>
           </div>
           <el-input class="login-item" v-model="registerPassword" placeholder="请输入密码" prefix-icon="el-icon-key" show-password @keyup.enter="login"></el-input>
           <el-input class="login-item" v-model="registerAgain" placeholder="请确认密码" prefix-icon="el-icon-key" show-password @keyup.enter="login"></el-input>
@@ -39,6 +41,7 @@
             <el-link class="right" type="primary" :underline="false" @click="chooseInterface(1)">返回登录</el-link>
           </div>
         </div>
+        <!--找回密码-->
         <div class="login-form" v-if="choose===3">
           <p class="title1">找回密码</p>
           <el-input class="login-item" v-model="findEmail" placeholder="请输入用户邮箱" clearable prefix-icon="el-icon-user"></el-input>
@@ -77,7 +80,8 @@ export default {
       findEmail: '',
       findCode: '',
       findPassword: '',
-      findAgain: ''
+      findAgain: '',
+      code30s: '发送验证'
     }
   },
   mounted () {

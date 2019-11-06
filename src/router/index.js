@@ -36,6 +36,6 @@ export default new Router({
       path: '*',
       redirect: '/INPlant_Web'
     }
-  ],
-  mode: 'history'
+  ]
+  // mode: 'history'
 })
