@@ -25,7 +25,7 @@
       <div class="row">
         <div class="col">
           <p class="word">可溶盐浓度：</p>
-          <div class="data" v-if="this.nutrientConcentration[this.nutrientConcentration.length-1]">{{this.nutrientConcentration[this.nutrientConcentration.length-1]}}mS/cm</div>
+          <div class="data" v-if="this.nutrientConcentration[this.nutrientConcentration.length-1]">{{this.nutrientConcentration[this.nutrientConcentration.length-1]}}us/cm</div>
           <div class="data" v-if="!this.nutrientConcentration[this.nutrientConcentration.length-1]">NULL</div>
         </div>
         <div class="col">

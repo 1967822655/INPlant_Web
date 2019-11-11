@@ -5,23 +5,8 @@
     </div>
     <el-divider></el-divider>
     <div class="module-content" v-loading="fullscreenLoading">
+<!--      蓝色-->
       <el-row  class="deviceSettings-input" :gutter="10">
-        <el-col :span="8">
-          <el-card class="box-card" shadow="hover">
-            <div>
-              <el-tag class="card-name">营养液浓度(us/cm)</el-tag>
-              <i class="el-icon-edit-outline card-edit" v-show="nutrientNotEdit" @click="nutrientNotEdit = !nutrientNotEdit"></i>
-              <i class="el-icon-finished card-edit" v-show="!nutrientNotEdit" @click="commitNutrientToServer()"></i>
-              <i class="el-icon-close card-edit" v-show="!nutrientNotEdit" @click="nutrientNotEdit = !nutrientNotEdit"></i>
-            </div>
-            <div>
-              <input
-                type="number"
-                v-model="nutrientSet"
-                :disabled="nutrientNotEdit">
-            </div>
-          </el-card>
-        </el-col>
         <el-col :span="8">
           <el-card class="box-card" shadow="hover">
             <div>
@@ -41,32 +26,38 @@
         <el-col :span="8">
           <el-card class="box-card" shadow="hover">
             <div>
-              <el-tag class="card-name">ph值</el-tag>
-              <i class="el-icon-edit-outline card-edit" v-show="phNotEdit" @click="phNotEdit = !phNotEdit"></i>
-              <i class="el-icon-finished card-edit" v-show="!phNotEdit" @click="commitPhToServer()"></i>
-              <i class="el-icon-close card-edit" v-show="!phNotEdit" @click="phNotEdit = !phNotEdit"></i>
+              <el-tag class="card-name">风扇时间(s)</el-tag>
+              <i class="el-icon-edit-outline card-edit" v-show="fanNotEdit" @click="fanNotEdit = !fanNotEdit"></i>
+              <i class="el-icon-finished card-edit" v-show="!fanNotEdit" @click="commitFanTimeToServer()"></i>
+              <i class="el-icon-close card-edit" v-show="!fanNotEdit" @click="fanNotEdit = !fanNotEdit"></i>
             </div>
             <div>
               <input
                 type="number"
-                v-model="phSet"
-                :disabled="phNotEdit">
+                v-model="fanSet"
+                :disabled="fanNotEdit">
+            </div>
+          </el-card>
+        </el-col>
+        <el-col :span="8">
+          <el-card class="box-card" shadow="hover">
+            <div>
+              <el-tag class="card-name">营养液浓度(us/cm)</el-tag>
+              <i class="el-icon-edit-outline card-edit" v-show="nutrientNotEdit" @click="nutrientNotEdit = !nutrientNotEdit"></i>
+              <i class="el-icon-finished card-edit" v-show="!nutrientNotEdit" @click="commitNutrientToServer()"></i>
+              <i class="el-icon-close card-edit" v-show="!nutrientNotEdit" @click="nutrientNotEdit = !nutrientNotEdit"></i>
+            </div>
+            <div>
+              <input
+                type="number"
+                v-model="nutrientSet"
+                :disabled="nutrientNotEdit">
             </div>
           </el-card>
         </el-col>
       </el-row>
+<!--      黄色-->
       <el-row class="deviceSettings-switch" :gutter="10">
-        <el-col :span="8">
-          <el-card class="box-card" shadow="hover">
-            <el-tag class="card-name">风扇</el-tag>
-            <el-switch
-              v-model="fanSetAndValue"
-              active-color="#13ce66"
-              inactive-color="#ff4949"
-              @change="commitFanToServer()">
-            </el-switch>
-          </el-card>
-        </el-col>
         <el-col :span="8">
           <el-card class="box-card" shadow="hover">
             <el-tag class="card-name">LED灯</el-tag>
@@ -80,16 +71,74 @@
         </el-col>
         <el-col :span="8">
           <el-card class="box-card" shadow="hover">
+            <el-tag class="card-name">风扇</el-tag>
+            <el-switch
+              v-model="fanSetAndValue"
+              active-color="#13ce66"
+              inactive-color="#ff4949"
+              @change="commitFanToServer()">
+            </el-switch>
+          </el-card>
+        </el-col>
+        <el-col :span="8">
+          <el-card class="box-card" shadow="hover">
             <el-tag class="card-name">循环泵</el-tag>
             <el-switch
+              v-show="autoControl==='out'"
               v-model="pumpSetAndValue"
               active-color="#13ce66"
               inactive-color="#ff4949"
               @change="commitPumpToServer()">
             </el-switch>
+            <el-switch
+              v-show="autoControl!=='out'||autoControl===''"
+              v-model="pumpSetAndValue"
+              disabled>
+            </el-switch>
           </el-card>
         </el-col>
       </el-row>
+<!--      手动-->
+      <el-row class="deviceSettings-switch" :gutter="10">
+        <el-col :span="8">
+          <el-card class="box-card" shadow="hover">
+            <el-tag class="card-name">抽水</el-tag>
+            <el-switch
+              v-model="chouShui"
+              active-color="#13ce66"
+              inactive-color="#ff4949"
+              @change="chouShuiToServer()">
+            </el-switch>
+          </el-card>
+        </el-col>
+        <el-col :span="8">
+          <el-card class="box-card" shadow="hover">
+            <el-tag class="card-name">放水</el-tag>
+            <el-switch
+              v-model="fangShui"
+              active-color="#13ce66"
+              inactive-color="#ff4949"
+              @change="fangShuiToServer()">
+            </el-switch>
+          </el-card>
+        </el-col>
+        <el-col :span="8">
+          <el-card class="box-card" shadow="hover">
+            <el-tag class="card-name">换箱</el-tag>
+            <el-switch
+              v-model="huanXiang"
+              active-color="#13ce66"
+              inactive-color="#ff4949"
+              @change="huanXiangToServer()">
+            </el-switch>
+          </el-card>
+        </el-col>
+      </el-row>
+      营养液自动调配状态：
+      <span v-if="autoControl==='out'">未调配</span>
+      <span v-if="autoControl==='auto_compound'">正在调配营养液</span>
+      <span v-if="autoControl==='auto_changew'">正在换箱</span>
+      <span v-if="autoControl==='auto_circulatew'">正在循环</span>
     </div>
   </div>
 </template>
@@ -112,13 +161,17 @@ export default {
     return {
       nutrientSet: 0,
       lightSet: 0,
-      phSet: 0,
+      fanSet: 0,
       fanSetAndValue: false,
       ledSetAndValue: false,
       pumpSetAndValue: false,
+      chouShui: false,
+      fangShui: false,
+      huanXiang: false,
+      autoControl: '',
       nutrientNotEdit: true,
       lightNotEdit: true,
-      phNotEdit: true,
+      fanNotEdit: true,
       fullscreenLoading: false,
       editObjectName: '',
       websock: undefined
@@ -151,7 +204,7 @@ export default {
         console.log('null')
       } else {
         let data = JSON.parse(e.data)
-        // console.log(data)
+        console.log(data)
         /**
          * 修改状态中，开关类型参数等待10s内，再显示实时数据正常值
          */
@@ -168,8 +221,8 @@ export default {
           if (this.nutrientNotEdit && this.nutrientSet !== data.ec) {
             this.nutrientSet = data.ec
           }
-          if (this.phNotEdit && this.nutrientSet !== data.ph) {
-            this.phSet = data.ph
+          if (this.fanNotEdit && this.nutrientSet !== data.fantime) {
+            this.fanSet = data.fantime
           }
           if (this.fanSetAndValue !== Boolean(data['fan'])) {
             this.fanSetAndValue = Boolean(data['fan'])
@@ -179,6 +232,18 @@ export default {
           }
           if (this.pumpSetAndValue !== Boolean(data['pump'])) {
             this.pumpSetAndValue = Boolean(data['pump'])
+          }
+          if (this.chouShui !== Boolean(data['choushui'])) {
+            this.chouShui = Boolean(data['shoushui'])
+          }
+          if (this.fangShui !== Boolean(data['fangshui'])) {
+            this.fangShui = Boolean(data['fangshui'])
+          }
+          if (this.huanXiang !== Boolean(data['huanxiang'])) {
+            this.huanXiang = Boolean(data['huanxiang'])
+          }
+          if (this.autoControl !== data['auto_control']) {
+            this.autoControl = data['auto_control']
           }
         }
       }
@@ -206,7 +271,7 @@ export default {
       upCtrl.append('msg', msg)
       console.log(msg)
       // 超时10s
-      this.axios.post(data.serverSrc + '/dev/downctrl', upCtrl, {timeout: 1000 * 10}).then(body => {
+      this.axios.post(data.serverSrc + '/dev/downctrl', upCtrl).then(body => {
         console.log(body.data)
         console.log(typeof body.data)
         var infoMsg = '提交成功'
@@ -238,7 +303,8 @@ export default {
       if (newNutrient >= 0 && newNutrient <= 4400) {
         console.log(newNutrient)
         var msg = JSON.stringify({
-          'ec': newNutrient
+          'ec': newNutrient,
+          'style': 0
         })
         console.log(msg)
         this.commitToServer(msg)
@@ -271,16 +337,15 @@ export default {
         }, 1000)
       }
     },
-    commitPhToServer () {
-      this.phNotEdit = !this.phNotEdit
+    commitFanTimeToServer () {
+      this.fanNotEdit = !this.fanNotEdit
       this.fullscreenLoading = !this.fullscreenLoading
-      console.log('commitNutrientToServer')
-      var newPh = parseFloat(this.phSet)
-      console.log(newPh)
-      if (newPh >= 0 && newPh <= 14) {
-        console.log(newPh)
+      var newFan = parseFloat(this.fanSet)
+      console.log(newFan)
+      if (newFan >= 0) {
+        console.log(newFan)
         var msg = JSON.stringify({
-          'ph': newPh
+          'fan_time': newFan
         })
         console.log(msg)
         this.commitToServer(msg)
@@ -313,7 +378,35 @@ export default {
       this.fullscreenLoading = !this.fullscreenLoading
       this.editObjectName = 'pump'
       var msg = JSON.stringify({
-        'pump': this.pumpSetAndValue ? 1 : 0
+        'pump': this.pumpSetAndValue ? 1 : 0,
+        'style': 0
+      })
+      this.commitToServer(msg)
+    },
+    chouShuiToServer () {
+      this.fullscreenLoading = !this.fullscreenLoading
+      this.editObjectName = 'chouShui'
+      var msg = JSON.stringify({
+        'choushui': this.pumpSetAndValue ? 1 : 0,
+        'style': 1
+      })
+      this.commitToServer(msg)
+    },
+    fangShuiToServer () {
+      this.fullscreenLoading = !this.fullscreenLoading
+      this.editObjectName = 'fangShui'
+      var msg = JSON.stringify({
+        'fangshui': this.fangShui ? 1 : 0,
+        'style': 1
+      })
+      this.commitToServer(msg)
+    },
+    huanXiangToServer () {
+      this.fullscreenLoading = !this.fullscreenLoading
+      this.editObjectName = 'huanXiang'
+      var msg = JSON.stringify({
+        'huanxiang': this.huanXiang ? 1 : 0,
+        'style': 1
       })
       this.commitToServer(msg)
     }

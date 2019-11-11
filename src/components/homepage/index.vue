@@ -279,18 +279,20 @@ export default {
     this.axios.post(data.serverSrc + '/userdev/showdev', showdev).then(body => {
       console.log(body)
       for (let i = 0; i < body.data.length; i++) {
-        if (body.data[i].kind === 'tomato') {
-          this.numbers.tomato.push(body.data[i])
-        } else if (body.data[i].kind === 'lettuce') {
-          this.numbers.lettuce.push(body.data[i])
-        } else if (body.data[i].kind === 'celery') {
-          this.numbers.celery.push(body.data[i])
-        } else if (body.data[i].kind === 'bitterMelon') {
-          this.numbers.bitterMelon.push(body.data[i])
-        } else if (body.data[i].kind === 'eggplant') {
-          this.numbers.eggplant.push(body.data[i])
-        } else if (body.data[i].kind === 'melon') {
-          this.numbers.melon.push(body.data[i])
+        if (body.data[i]) {
+          if (body.data[i].kind === 'tomato') {
+            this.numbers.tomato.push(body.data[i])
+          } else if (body.data[i].kind === 'lettuce') {
+            this.numbers.lettuce.push(body.data[i])
+          } else if (body.data[i].kind === 'celery') {
+            this.numbers.celery.push(body.data[i])
+          } else if (body.data[i].kind === 'bitterMelon') {
+            this.numbers.bitterMelon.push(body.data[i])
+          } else if (body.data[i].kind === 'eggplant') {
+            this.numbers.eggplant.push(body.data[i])
+          } else if (body.data[i].kind === 'melon') {
+            this.numbers.melon.push(body.data[i])
+          }
         }
       }
     })

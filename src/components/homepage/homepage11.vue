@@ -171,15 +171,15 @@ export default {
     // 历史数据请求接口
     getHistoryData (findHistory) {
       this.axios.post(data.serverSrc + '/dev/historydata', findHistory).then(body => {
-        // console.log(body)
+        console.log(body)
         this.time = []
         this.temperature = []
         this.humidity = []
         this.CO2concentration = []
         this.light = []
         this.ph = []
+        this.nutrientConcentration = []
         for (let i = 0; i < body.data.length; i++) {
-          this.nutrientConcentration = []
           this.time.push(body.data[i].time)
           this.temperature.push(body.data[i].temp)
           this.humidity.push(body.data[i].rh)
