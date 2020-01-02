@@ -1,5 +1,5 @@
 <template>
-  <div class="module">
+  <div class="module" style="min-width: 1100px;">
     <div class="module-title">
       <p>训练模型</p>
     </div>
@@ -8,43 +8,76 @@
       <el-table
         :data="modelTrainingTableData">
         <el-table-column
-          prop="date"
+          prop="traindataKey.days"
           label="时间"
           align="center">
-<!--          <template slot-scope="scope">-->
-<!--            <el-input size="small" v-model="scope.row.date"-->
-<!--                      placeholder="请输入内容"></el-input>-->
-<!--          </template>-->
+          <template slot-scope="scope">
+            第{{scope.row.traindataKey.days}}天
+          </template>
+        </el-table-column>
+        <el-table-column
+          prop="ec"
+          label="ec"
+          align="center">
+        </el-table-column>
+        <el-table-column
+          prop="light"
+          label="light"
+          align="center">
+        </el-table-column>
+        <el-table-column
+          prop="lighttime"
+          label="lighttime"
+          align="center">
+        </el-table-column>
+        <el-table-column
+          prop="ph"
+          label="ph"
+          align="center">
+        </el-table-column>
+        <el-table-column
+          prop="rh"
+          label="rh"
+          align="center">
+        </el-table-column>
+        <el-table-column
+          prop="temp"
+          label="temp"
+          align="center">
+        </el-table-column>
+        <el-table-column
+          prop="co2"
+          label="co2"
+          align="center">
         </el-table-column>
         <el-table-column
           label="生长率"
           align="center">
           <template slot-scope="scope">
-            <el-input size="small" v-model="scope.row.growthRate"
-                      placeholder="请输入内容"></el-input>
+            <el-input size="small" v-model="scope.row.cgr"
+                      placeholder="请输入内容">{{scope.row.cgr}}</el-input>
           </template>
         </el-table-column>
         <el-table-column
-          label="操作"
-          align="center">
-          <template slot-scope="scope">
-            <el-button
-              size="small"
-              type="primary"
-              icon="el-icon-plus"
-              @click="handlePlus(scope.$index, scope.row)">添加</el-button>
-            <el-button
-              size="small"
-              type="danger"
-              icon="el-icon-delete"
-              @click="handleDelete(scope.$index, scope.row)">删除</el-button>
-          </template>
-        </el-table-column>
+        label="操作"
+        align="center">
+        <template slot-scope="scope">
+          <el-button
+            size="small"
+            type="primary"
+            icon="el-icon-plus"
+            @click="upDateCgr(scope.row)">添加</el-button>
+        </template>
+      </el-table-column>
       </el-table>
       <div class="modelTraining-upload">
-        <el-progress id="modelTraining-progress" :text-inside="true" :stroke-width="26"
-                     :percentage="upProgress" v-show="upProgress > 0 ? true : false"></el-progress>
-        <el-button id="modelTraining-commit" type="primary" icon="el-icon-s-promotion" @click="handleCommit">训练</el-button>
+        {{upProgress}}
+        <el-input class="modelTraining-commit width150" size="small" v-model="upProgress.startDay"
+                  placeholder="请输入开始日期">{{upProgress.startDay}}</el-input>
+        <div class="modelTraining-commit">-</div>
+        <el-input class="modelTraining-commit width150" size="small" v-model="upProgress.endDay"
+                  placeholder="请输入截止日期">{{upProgress.endDay}}</el-input>
+        <el-button class="modelTraining-commit" type="primary" icon="el-icon-s-promotion" @click="handleCommit">训练</el-button>
       </div>
     </div>
   </div>
@@ -60,62 +93,60 @@ export default {
     this.showAllTrainData(device)
   },
   methods: {
-    handleDelete (index, row) {
-      console.log(index)
-      console.log(row)
-      this.modelTrainingTableData.splice(index, 1)
-    },
-    handlePlus (index, row) {
-      console.log(index)
-      console.log(row)
-      var newRow = {
-        growthRate: '0'
-      }
-      if (index === 0 && row.date[1] !== '1') {
-        newRow.date = '第1天'
-        this.modelTrainingTableData.splice(0, 0, newRow)
-      } else {
-        newRow.date = '第' + String(parseInt(row.date[1]) + 1) + '天'
-        this.modelTrainingTableData.splice(index + 1, 0, newRow)
-      }
-    },
+    // 训练天数
     handleCommit () {
-      console.log('提交，处理数据')
-      var timeId = setInterval(() => {
-        this.upProgress += 20
-      }, 1000)
-      setTimeout(() => {
-        clearInterval(timeId)
-      }, 5000)
+      if (parseInt(this.upProgress.startDay) < parseInt(this.upProgress.endDay)) {
+        this.upProgress.array = []
+        for (let i = parseInt(this.upProgress.startDay); i <= parseInt(this.upProgress.endDay); i++) {
+          this.upProgress.array.push(i)
+          console.log(i)
+        }
+        var temp = new FormData()
+        temp.append('days', this.upProgress.array)
+        console.log(sessionStorage.getItem('username'))
+        console.log(sessionStorage.getItem('chooseDevice'))
+        temp.append('username', sessionStorage.getItem('username'))
+        temp.append('deviceID', sessionStorage.getItem('chooseDevice'))
+        this.axios.put(data.serverSrc + '/traindata/starttrain', temp).then(body => {
+          console.log(body)
+        })
+      } else {
+        this.$message.error('请输入正确的天数')
+      }
     },
+    // 展示全部数据
     showAllTrainData (device) {
       this.axios.post(data.serverSrc + '/traindata/showall', device).then(body => {
-        console.log(body)
+        this.modelTrainingTableData = body.data
       })
+    },
+    upDateCgr (sourse) {
+      if (sourse.cgr) {
+        var temp = new FormData()
+        temp.append('deviceID', sessionStorage.getItem('chooseDevice'))
+        temp.append('day', sourse.traindataKey.days)
+        temp.append('Cgr', sourse.cgr)
+        console.log(data.serverSrc)
+        this.axios.post(data.serverSrc + '/traindata/updatecgr', temp).then(body => {
+          if (body.data === 'success') {
+            this.$message.success('上传成功')
+          } else {
+            this.$message.error('上传失败')
+          }
+        })
+      } else {
+        this.$message.error('参数不能为空')
+      }
     }
   },
   data () {
     return {
-      modelTrainingTableData: [{
-        date: '第1天',
-        growthRate: '0'
-      }, {
-        date: '第2天',
-        growthRate: '0'
-      }, {
-        date: '第3天',
-        growthRate: '0'
-      }, {
-        date: '第4天',
-        growthRate: '0'
-      }, {
-        date: '第5天',
-        growthRate: '0'
-      }, {
-        date: '第6天',
-        growthRate: '0'
-      }],
-      upProgress: 0
+      modelTrainingTableData: [],
+      upProgress: {
+        startDay: null,
+        endDay: null,
+        array: []
+      }
     }
   }
 }
@@ -128,15 +159,12 @@ export default {
     position: relative;
     margin-top: 20px;
   }
-  #modelTraining-commit {
-    right: 0;
-    position: absolute;
-    width: 10%;
+  .modelTraining-commit {
+    float: left;
+    margin-left: 10px;
+    margin-right: 10px;
   }
-  #modelTraining-progress {
-    width: 50%;
-    position: absolute;
-    left: 0;
-    margin-top: 10px;
+  .width150 {
+    width: 150px;
   }
 </style>
