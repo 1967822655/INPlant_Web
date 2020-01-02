@@ -14,28 +14,33 @@ export default new Router({
   routes: [
     {
       path: '/',
-      redirect: '/INPlant_Web'
-    },
-    {
-      path: '/INPlant_Web',
       component: login
     },
+    // {
+    //   path: '/INPlant_Web',
+    //   component: login
+    // },
     {
-      path: '/INPlant_Web/index',
+      path: '/index',
       component: index
     },
     {
-      path: '/INPlant_Web/homepage',
+      path: '/homepage',
       component: homepage
     },
     {
-      path: '/INPlant_Web/rootIndex',
+      path: '/rootIndex',
       component: rootIndex
     },
     {
       path: '*',
-      redirect: '/INPlant_Web'
+      redirect: '/'
     }
-  ]
+    // {
+    //   path: '*',
+    //   redirect: '/INPlant_Web'
+    // }
+  ],
+  base: '/INPlant'
   // mode: 'history'
 })

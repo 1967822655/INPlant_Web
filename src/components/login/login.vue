@@ -1,11 +1,11 @@
 <template>
     <div class="container">
       <div class="header" style="">
-        <img class="app-logo" src="../../assets/logo.png" />
+<!--        <img class="app-logo" src="../../assets/logo.png" />-->
         <h1>智慧种植系统平台</h1>
-        <a href="https://free.modao.cc/app/3rkxnjr01k3k0q3oce5po8q31wvpda#screen=sk0q3ocs96afkwz6g" target="_blank">墨刀样式</a>
-        <a href="https://docs.qq.com/sheet/DVWFNV0ZESllORG1j?tab=BB08J2&c=A1A0A0" target="_blank">接口文档</a>
-        <a href="http://106.15.195.144:8081/swagger-ui.html#/" target="_blank">接口文档(最新版)</a>
+<!--        <a href="https://free.modao.cc/app/3rkxnjr01k3k0q3oce5po8q31wvpda#screen=sk0q3ocs96afkwz6g" target="_blank">墨刀样式</a>-->
+<!--        <a href="https://docs.qq.com/sheet/DVWFNV0ZESllORG1j?tab=BB08J2&c=A1A0A0" target="_blank">接口文档</a>-->
+<!--        <a href="http://106.15.195.144:8081/swagger-ui.html#/" target="_blank">接口文档(最新版)</a>-->
       </div>
       <div class="login-picture">
         <!--用户登录-->
@@ -162,11 +162,11 @@ export default {
           if (body.data === 'success') {
             sessionStorage.setItem('username', this.inputEmail)// 存储本地用户名
             this.$message.success('登录成功')
-            this.$router.push('/INPlant_Web/index')// 跳转主界面
+            this.$router.push('/index')// 跳转主界面
           } else if (body.data === 'root') {
             sessionStorage.setItem('username', this.inputEmail)// 存储本地用户名
             this.$message.success('登录成功')
-            this.$router.push('/INPlant_Web/rootIndex')
+            this.$router.push('/rootIndex')
           } else if (body.data === 'not exist') {
             this.$message.error('用户名不存在')
             this.inputEmail = ''
@@ -274,12 +274,12 @@ export default {
         if (!this.inputEmail) return []
         if (this.inputEmail.indexOf('@') > -1) return []
         return [
+          this.inputEmail + '@qq.com',
           this.inputEmail + '@163.com',
           this.inputEmail + '@126.com',
           this.inputEmail + '@0355.net',
           this.inputEmail + '@263.net',
           this.inputEmail + '@3721.net',
-          this.inputEmail + '@qq.com',
           this.inputEmail + '@yahoo.com',
           this.inputEmail + '@gmail.com',
           this.inputEmail + '@msn.com',
@@ -338,7 +338,7 @@ export default {
 <style scoped>
   .container {
     width: 100%;
-    height: 100%;
+    height: 90%;
     float: left;
     position: relative;
   }

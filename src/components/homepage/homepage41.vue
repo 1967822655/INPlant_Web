@@ -51,8 +51,14 @@
 </template>
 
 <script>
+import data from '../cache'
 export default {
   name: 'homepage41',
+  created () {
+    var device = new FormData()
+    device.append('deviceID', sessionStorage.getItem('chooseDevice'))
+    this.showAllTrainData(device)
+  },
   methods: {
     handleDelete (index, row) {
       console.log(index)
@@ -81,6 +87,11 @@ export default {
       setTimeout(() => {
         clearInterval(timeId)
       }, 5000)
+    },
+    showAllTrainData (device) {
+      this.axios.post(data.serverSrc + '/traindata/showall', device).then(body => {
+        console.log(body)
+      })
     }
   },
   data () {

@@ -8,8 +8,9 @@
         active-text-color="#fff"
         mode="horizontal"
       >
-        <div style="float: left;height: 60px;"><img src="../../assets/logo.png" style="height: 40px;width:110px"></div>
-        <div style="float: left;color:#fff;height: 60px;line-height: 60px">智能种植系统</div>
+<!--        <div style="float: left;height: 60px;"><img src="../../assets/logo.png" style="height: 40px;width:110px"></div>-->
+        <div style="float: left;height: 60px;width: 50px"></div>
+        <div style="float: left;color:#fff;height: 60px;line-height: 60px">智慧种植系统</div>
         <el-submenu index="1" style="float: right;right: 0px;">
           <template slot="title">
             你好！

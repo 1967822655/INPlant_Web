@@ -105,7 +105,7 @@ export default {
       let data = JSON.parse(e.data)
       console.log(data)
       this.time.push(new Date().toString().split('GMT')[0])
-      this.temperature.push(data.temperature)
+      this.temperature.push(data.watertem)
       this.humidity.push(data.humidity)
       this.CO2concentration.push(data.co2)
       this.light.push(data.light_intensity)

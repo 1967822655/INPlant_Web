@@ -8,8 +8,9 @@
         active-text-color="#fff"
         mode="horizontal"
       >
-        <div style="float: left;height: 60px;"><img src="../../assets/logo.png" style="height: 40px;width:110px"></div>
-        <div style="float: left;color:#fff;height: 60px;line-height: 60px">智能种植系统</div>
+<!--        <div style="float: left;height: 60px;"><img src="../../assets/logo.png" style="height: 40px;width:110px"></div>-->
+        <div style="float: left;height: 60px;width: 50px"></div>
+        <div style="float: left;color:#fff;height: 60px;line-height: 60px">智慧种植系统</div>
         <el-submenu index="1" style="float: right;right: 0px;">
           <template slot="title">
             你好！
@@ -53,7 +54,7 @@
                         <div>实验台ID：{{number.deviceid}}</div>
                         <div>培育天数：{{number.startday}}天</div>
                         <div>描述：<textarea v-model="number.remarks"></textarea></div>
-                        <el-button style="float: right" type="success" @click="chooseDevice(number.deviceid)">进入实验室</el-button>
+                        <el-button style="float: right" type="success" @click="chooseDevice(number.deviceid)">进入实验台</el-button>
                       </div>
                       <div style="clear: both;height: 50px;width: 100px"></div>
                     </div></div></div>
@@ -86,7 +87,7 @@
                         <div>实验台ID：{{number.deviceid}}</div>
                         <div>培育天数：{{number.startday}}天</div>
                         <div>描述：<textarea v-model="number.remarks"></textarea></div>
-                        <el-button type="success" @click="chooseDevice(number.deviceid)">进入实验室</el-button>
+                        <el-button type="success" @click="chooseDevice(number.deviceid)">进入实验台</el-button>
                       </div>
                       <div style="clear: both;height: 50px;width: 100px"></div>
                     </div></div></div>
@@ -119,7 +120,7 @@
                         <div>实验台ID：{{number.deviceid}}</div>
                         <div>培育天数：{{number.startday}}天</div>
                         <div>描述：<textarea v-model="number.remarks"></textarea></div>
-                        <el-button type="success" @click="chooseDevice(number.deviceid)">进入实验室</el-button>
+                        <el-button type="success" @click="chooseDevice(number.deviceid)">进入实验台</el-button>
                       </div>
                       <div style="clear: both;height: 50px;width: 100px"></div>
                     </div></div></div>
@@ -152,7 +153,7 @@
                         <div>实验台ID：{{number.deviceid}}</div>
                         <div>培育天数：{{number.startday}}天</div>
                         <div>描述：<textarea v-model="number.remarks"></textarea></div>
-                        <el-button type="success" @click="chooseDevice(number.deviceid)">进入实验室</el-button>
+                        <el-button type="success" @click="chooseDevice(number.deviceid)">进入实验台</el-button>
                       </div>
                       <div style="clear: both;height: 50px;width: 100px"></div>
                     </div></div></div>
@@ -185,7 +186,7 @@
                         <div>实验台ID：{{number.deviceid}}</div>
                         <div>培育天数：{{number.startday}}天</div>
                         <div>描述：<textarea v-model="number.remarks"></textarea></div>
-                        <el-button type="success" @click="chooseDevice(number.deviceid)">进入实验室</el-button>
+                        <el-button type="success" @click="chooseDevice(number.deviceid)">进入实验台</el-button>
                       </div>
                       <div style="clear: both;height: 50px;width: 100px"></div>
                     </div></div></div>
@@ -218,7 +219,7 @@
                         <div>实验台ID：{{number.deviceid}}</div>
                         <div>培育天数：{{number.startday}}天</div>
                         <div>描述：<textarea v-model="number.remarks"></textarea></div>
-                        <el-button @click="chooseDevice(number.deviceid)">进入实验室</el-button>
+                        <el-button @click="chooseDevice(number.deviceid)">进入实验台</el-button>
                       </div>
                       <div style="clear: both;height: 50px;width: 100px"></div>
                     </div></div></div>
@@ -334,7 +335,7 @@ export default {
     },
     // 跳转单个实验台详细界面
     enterInterface () {
-      this.$router.push('/INPlant_Web/homepage')
+      this.$router.push('/homepage')
     }
     // // 添加设备
     // addDevice () {

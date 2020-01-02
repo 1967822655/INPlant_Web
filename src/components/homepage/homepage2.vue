@@ -1,16 +1,17 @@
 <template>
   <div class="module">
+    <!--    手动调节-->
     <div class="module-title">
-      <p>设备调节</p>
+      <p>手动调节</p>
     </div>
     <el-divider></el-divider>
     <div class="module-content" v-loading="fullscreenLoading">
-<!--      蓝色-->
+      <!--      蓝色-->
       <el-row  class="deviceSettings-input" :gutter="10">
         <el-col :span="8">
           <el-card class="box-card" shadow="hover">
             <div>
-              <el-tag class="card-name">光照时间(s)</el-tag>
+              <el-tag class="card-name">光照时间</el-tag>
               <i class="el-icon-edit-outline card-edit" v-show="lightNotEdit" @click="lightNotEdit = !lightNotEdit"></i>
               <i class="el-icon-finished card-edit" v-show="!lightNotEdit" @click="commitLightToServer()"></i>
               <i class="el-icon-close card-edit" v-show="!lightNotEdit" @click="lightNotEdit = !lightNotEdit"></i>
@@ -20,13 +21,18 @@
                 type="number"
                 v-model="lightSet"
                 :disabled="lightNotEdit">
+<!--              <input-->
+<!--                type="number"-->
+<!--                v-model="ChangeLedTime"-->
+<!--                :disabled="true">-->
+              <span class="changeTime">{{ChangeLedTime}}</span>
             </div>
           </el-card>
         </el-col>
         <el-col :span="8">
           <el-card class="box-card" shadow="hover">
             <div>
-              <el-tag class="card-name">风扇时间(s)</el-tag>
+              <el-tag class="card-name">风扇时间</el-tag>
               <i class="el-icon-edit-outline card-edit" v-show="fanNotEdit" @click="fanNotEdit = !fanNotEdit"></i>
               <i class="el-icon-finished card-edit" v-show="!fanNotEdit" @click="commitFanTimeToServer()"></i>
               <i class="el-icon-close card-edit" v-show="!fanNotEdit" @click="fanNotEdit = !fanNotEdit"></i>
@@ -36,6 +42,11 @@
                 type="number"
                 v-model="fanSet"
                 :disabled="fanNotEdit">
+<!--              <input-->
+<!--                type="number"-->
+<!--                v-model="ChangeFanTime"-->
+<!--                :disabled="true">-->
+              <span class="changeTime">{{ChangeFanTime}}</span>
             </div>
           </el-card>
         </el-col>
@@ -56,7 +67,7 @@
           </el-card>
         </el-col>
       </el-row>
-<!--      黄色-->
+      <!--      黄色-->
       <el-row class="deviceSettings-switch" :gutter="10">
         <el-col :span="8">
           <el-card class="box-card" shadow="hover">
@@ -98,7 +109,6 @@
           </el-card>
         </el-col>
       </el-row>
-<!--      手动-->
       <el-row class="deviceSettings-switch" :gutter="10">
         <el-col :span="8">
           <el-card class="box-card" shadow="hover">
@@ -134,12 +144,18 @@
           </el-card>
         </el-col>
       </el-row>
-      营养液自动调配状态：
+      <div style="font-size: 12px;font-weight: bold;margin-bottom: 20px">营养液自动调配状态：
       <span v-if="autoControl==='out'">未调配</span>
       <span v-if="autoControl==='auto_compound'">正在调配营养液</span>
       <span v-if="autoControl==='auto_changew'">正在换箱</span>
       <span v-if="autoControl==='auto_circulatew'">正在循环</span>
+      </div>
     </div>
+    <!--    自动调节-->
+    <div class="module-title">
+      <p>自动调节</p>
+    </div>
+    <el-divider></el-divider>
   </div>
 </template>
 
@@ -149,12 +165,14 @@ export default {
   name: 'homepage2',
   created () {
     // websocket初始化 -> load data of nutrient light fan
+    this.setAllInterval()
     this.initWebSocket()
   },
   // 离开该层时执行
   beforeDestroy () {
     // 离开路由之后断开websocket连接
     console.log('离开homepage2')
+    this.clearAllInterval()
     this.websock.close()
   },
   data () {
@@ -163,7 +181,11 @@ export default {
       lightSet: 0,
       fanSet: 0,
       fanSetAndValue: false,
+      fanTime: 0,
+      ChangeFanTime: '',
       ledSetAndValue: false,
+      ledTime: 0,
+      ChangeLedTime: '',
       pumpSetAndValue: false,
       chouShui: false,
       fangShui: false,
@@ -174,7 +196,9 @@ export default {
       fanNotEdit: true,
       fullscreenLoading: false,
       editObjectName: '',
-      websock: undefined
+      websock: undefined,
+      ledInterval: null,
+      fanInterval: null
     }
   },
   methods: {
@@ -221,9 +245,9 @@ export default {
           if (this.nutrientNotEdit && this.nutrientSet !== data.ec) {
             this.nutrientSet = data.ec
           }
-          if (this.fanNotEdit && this.nutrientSet !== data.fantime) {
-            this.fanSet = data.fantime
-          }
+          // if (this.fanNotEdit && this.nutrientSet !== data.fantime) {
+          //   this.fanSet = data.fantime
+          // }
           if (this.fanSetAndValue !== Boolean(data['fan'])) {
             this.fanSetAndValue = Boolean(data['fan'])
           }
@@ -244,6 +268,12 @@ export default {
           }
           if (this.autoControl !== data['auto_control']) {
             this.autoControl = data['auto_control']
+          }
+          if (this.ledTime !== data['ledtime']) {
+            this.ledTime = data['ledtime']
+          }
+          if (this.fanTime !== data['fantime']) {
+            this.fanTime = data['fantime']
           }
         }
       }
@@ -322,6 +352,7 @@ export default {
       console.log('commitNutrientToServer')
       var newLight = parseFloat(this.lightSet)
       console.log(newLight)
+      this.lightSet = 0
       if (newLight >= 0) {
         console.log(newLight)
         var msg = JSON.stringify({
@@ -342,6 +373,7 @@ export default {
       this.fullscreenLoading = !this.fullscreenLoading
       var newFan = parseFloat(this.fanSet)
       console.log(newFan)
+      this.fanSet = 0
       if (newFan >= 0) {
         console.log(newFan)
         var msg = JSON.stringify({
@@ -409,6 +441,53 @@ export default {
         'style': 1
       })
       this.commitToServer(msg)
+    },
+    setAllInterval () {
+      let that = this
+      this.ledInterval = setInterval(function () {
+        // console.log(that.ledTime)
+        if (that.ledTime !== 0) {
+          that.ledTime -= 1
+        }
+        that.ChangeLedTime = that.formatSeconds(that.ledTime)
+      }, 1000)
+      this.fanInterval = setInterval(function () {
+        // console.log(that.fanTime)
+        if (that.fanTime !== 0) {
+          that.fanTime -= 1
+        }
+        that.ChangeFanTime = that.formatSeconds(that.fanTime)
+      }, 1000)
+    },
+    clearAllInterval () {
+      clearInterval(this.ledInterval)
+      clearInterval(this.fanInterval)
+    },
+    formatSeconds (value) {
+      var secondTime = parseInt(value)// 秒
+      var minuteTime = 0// 分
+      var hourTime = 0// 小时
+      if (secondTime > 60) { // 如果秒数大于60，将秒数转换成整数
+        // 获取分钟，除以60取整数，得到整数分钟
+        minuteTime = parseInt(secondTime / 60)
+        // 获取秒数，秒数取佘，得到整数秒数
+        secondTime = parseInt(secondTime % 60)
+        // 如果分钟大于60，将分钟转换成小时
+        if (minuteTime > 60) {
+          // 获取小时，获取分钟除以60，得到整数小时
+          hourTime = parseInt(minuteTime / 60)
+          // 获取小时后取佘的分，获取分钟除以60取佘的分
+          minuteTime = parseInt(minuteTime % 60)
+        }
+      }
+      var result = '' + parseInt(secondTime)
+      if (minuteTime > 0) {
+        result = '' + parseInt(minuteTime) + ':' + result
+      }
+      if (hourTime > 0) {
+        result = '' + parseInt(hourTime) + ':' + result
+      }
+      return result
     }
   }
 }
@@ -454,17 +533,26 @@ export default {
     margin-left: 5px;
   }
   .deviceSettings-input .box-card input {
-    width: 100px;
+    width: 40%;
     margin-top: 10px;
     font-size: 23px;
     color: black;
     border-radius: 5px;
     border: 1px solid #d9ecff;
+    min-width: 90px;
   }
   .deviceSettings-input .box-card input:disabled {
     background:none;
     outline:none;
     border:none;
+    font-size: 25px;
+    color: white;
+    min-width: 90px;
+  }
+  .changeTime {
+    background: none;
+    outline: none;
+    border: none;
     font-size: 25px;
     color: white;
   }

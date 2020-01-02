@@ -237,27 +237,27 @@ export default {
         yAxis: {
           type: 'value'
         },
-        dataZoom: [
-          {
-            show: true,
-            start: 0,
-            end: 10
-          },
-          {
-            type: 'inside',
-            start: 0,
-            end: 10
-          },
-          {
-            show: true,
-            yAxisIndex: 0,
-            filterMode: 'empty',
-            width: 30,
-            height: '83%',
-            showDataShadow: false,
-            left: '96%'
-          }
-        ],
+        // dataZoom: [
+        //   {
+        //     show: true,
+        //     start: 0,
+        //     end: 10
+        //   },
+        //   {
+        //     type: 'inside',
+        //     start: 0,
+        //     end: 10
+        //   },
+        //   {
+        //     show: true,
+        //     yAxisIndex: 0,
+        //     filterMode: 'empty',
+        //     width: 30,
+        //     height: '83%',
+        //     showDataShadow: false,
+        //     left: '96%'
+        //   }
+        // ],
         series: [
           {
             name: '温度',

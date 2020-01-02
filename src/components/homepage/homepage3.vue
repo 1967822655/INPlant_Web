@@ -63,6 +63,8 @@
         <el-button type="primary" @click="update " :loading="isUpLoading">{{isUpLoading ?  '更新中' : '确 定'}}</el-button>
       </div>
     </el-dialog>
+    <div>
+  </div>
   </div>
 </template>
 
@@ -289,7 +291,131 @@ export default {
       },
       formLabelWidth: '100px',
       thresholdInputError: '',
-      isUpLoading: false
+      isUpLoading: false,
+      data2: [
+        {
+          label: '平台名称',
+          porp: 'platForm'
+        },
+        {label: '版本', porp: 'version'},
+        {label: '菜单', porp: 'view'},
+        {label: '子菜单', porp: 'sonView'},
+        {label: '菜单点击次数', porp: 'clickNumber'},
+        {label: '菜单点击人数', porp: 'clickPopleNumber'},
+        {label: '人均点击次数', porp: 'clickFlatNumber'}
+      ],
+      tableData2: [
+        {
+          platForm: '1',
+          version: '2',
+          view: '智慧服务',
+          sonView: '当天挂号',
+          clickNumber: '1',
+          clickPopleNumber: '2',
+          clickFlatNumber: '3'
+        },
+        {
+          platForm: '',
+          version: '',
+          view: '',
+          sonView: '预约挂号',
+          clickNumber: '1',
+          clickPopleNumber: '2',
+          clickFlatNumber: '3'
+        },
+        {
+          platForm: '',
+          version: '',
+          view: '',
+          sonView: '智能就医助手',
+          clickNumber: '4',
+          clickPopleNumber: '5',
+          clickFlatNumber: '6'
+        },
+        {
+          platForm: '1',
+          version: '2',
+          view: '智慧服务',
+          sonView: '当天挂号',
+          clickNumber: '1',
+          clickPopleNumber: '2',
+          clickFlatNumber: '3'
+        },
+        {
+          platForm: '',
+          version: '',
+          view: '',
+          sonView: '预约挂号',
+          clickNumber: '1',
+          clickPopleNumber: '2',
+          clickFlatNumber: '3'
+        },
+        {
+          platForm: '',
+          version: '',
+          view: '',
+          sonView: '智能就医助手',
+          clickNumber: '4',
+          clickPopleNumber: '5',
+          clickFlatNumber: '6'
+        },
+        {
+          platForm: '1',
+          version: '2',
+          view: '智慧服务',
+          sonView: '当天挂号',
+          clickNumber: '1',
+          clickPopleNumber: '2',
+          clickFlatNumber: '3'
+        },
+        {
+          platForm: '',
+          version: '',
+          view: '',
+          sonView: '预约挂号',
+          clickNumber: '1',
+          clickPopleNumber: '2',
+          clickFlatNumber: '3'
+        },
+        {
+          platForm: '',
+          version: '',
+          view: '',
+          sonView: '智能就医助手',
+          clickNumber: '4',
+          clickPopleNumber: '5',
+          clickFlatNumber: '6'
+        },
+        {
+          platForm: '1',
+          version: '2',
+          view: '智慧服务',
+          sonView: '当天挂号',
+          clickNumber: '1',
+          clickPopleNumber: '2',
+          clickFlatNumber: '3'
+        },
+        {
+          platForm: '',
+          version: '',
+          view: '',
+          sonView: '预约挂号',
+          clickNumber: '1',
+          clickPopleNumber: '2',
+          clickFlatNumber: '3'
+        },
+        {
+          platForm: '',
+          version: '',
+          view: '',
+          sonView: '智能就医助手',
+          clickNumber: '4',
+          clickPopleNumber: '5',
+          clickFlatNumber: '6'
+        }],
+      temp: [3, 3, 2],
+      sum: 0,
+      pointer: 0
     }
   }
 }

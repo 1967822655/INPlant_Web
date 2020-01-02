@@ -6,7 +6,37 @@
 
 <script>
 export default {
-  name: 'App'
+  name: 'App',
+  mounted () {
+    var view = this.getViewportOffset()
+    console.log(view)
+    if (view.w < 768) {
+      var app = document.getElementById('app')
+      app.style.width = '1200px'
+    }
+  },
+  methods: {
+    getViewportOffset () {
+      if (window.innerWidth) {
+        return {
+          w: window.innerWidth,
+          h: window.innerHeight
+        }
+      } else {
+        if (document.compatMode === 'BackCompat') {
+          return {
+            w: document.body.clientWidth,
+            h: document.body.clientHeight
+          }
+        } else {
+          return {
+            w: document.documentElement.clientWidth,
+            h: document.documentElement.clientHeight
+          }
+        }
+      }
+    }
+  }
 }
 </script>
 
@@ -16,7 +46,9 @@ export default {
   margin: 0px;
 }
 html,body,#app {
+  /*width: 1200px;*/
   height: 100%;
+  margin: 0 auto;
 }
 #app {
   font-family: 'Avenir', Helvetica, Arial, sans-serif;
